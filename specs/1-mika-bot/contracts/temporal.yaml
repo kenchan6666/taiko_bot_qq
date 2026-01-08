@@ -1,0 +1,173 @@
+# Temporal Workflow and Activity Definitions
+# This file documents the Temporal workflow structure for the Mika chatbot
+
+workflows:
+  process_message_workflow:
+    description: |
+      Orchestrates the 5-step message processing chain:
+      1. Parse input and detect "Mika" mention
+      2. Retrieve user context from MongoDB
+      3. Query taikowiki for song information
+      4. Invoke gpt-4o via OpenRouter
+      5. Update user impression and conversation history
+    activities:
+      - name: step1_parse_input
+        description: Parse message, detect "Mika" mention, filter content
+        timeout: 10s
+        retry_policy:
+          initial_interval: 1s
+          backoff_coefficient: 2.0
+          maximum_interval: 10s
+          maximum_attempts: 2
+      
+      - name: step2_retrieve_context
+        description: Retrieve user context (User, Impression, recent Conversations) from MongoDB
+        timeout: 5s
+        retry_policy:
+          initial_interval: 1s
+          backoff_coefficient: 2.0
+          maximum_interval: 5s
+          maximum_attempts: 3
+      
+      - name: step3_query_song
+        description: Query taikowiki JSON for song information with fuzzy matching
+        timeout: 10s
+        retry_policy:
+          initial_interval: 1s
+          backoff_coefficient: 2.0
+          maximum_interval: 30s
+          maximum_attempts: 3
+        fallback: return_empty_song_data
+      
+      - name: step4_invoke_llm
+        description: Invoke gpt-4o via OpenRouter with themed prompts
+        timeout: 30s
+        retry_policy:
+          initial_interval: 2s
+          backoff_coefficient: 2.0
+          maximum_interval: 60s
+          maximum_attempts: 3
+        fallback: return_default_response
+      
+      - name: step5_update_impression
+        description: Update user impression, conversation history in MongoDB
+        timeout: 10s
+        retry_policy:
+          initial_interval: 1s
+          backoff_coefficient: 2.0
+          maximum_interval: 10s
+          maximum_attempts: 3
+    
+    execution_timeout: 60s
+    task_timeout: 30s
+    
+    input_schema:
+      type: object
+      required:
+        - group_id
+        - user_id
+        - message
+      properties:
+        group_id:
+          type: string
+        user_id:
+          type: string
+        message:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+    
+    output_schema:
+      type: object
+      properties:
+        response:
+          type: string
+        workflow_id:
+          type: string
+        execution_time:
+          type: number
+
+activities:
+  step1_parse_input:
+    description: |
+      - Parse incoming message from LangBot
+      - Detect "Mika" mention using regex pattern (?i)(mika|米卡|mika酱)
+      - Filter harmful content (hatred, politics, religion)
+      - Hash user ID for privacy
+      - Return parsed data or None if filtered/not mentioned
+    input:
+      - group_id: string
+      - user_id: string
+      - message: string
+      - images: array (optional)
+    output:
+      - parsed_data: object (or None if filtered)
+      - hashed_user_id: string
+
+  step2_retrieve_context:
+    description: |
+      - Query MongoDB for User by hashed_user_id
+      - Query Impression by user_id (1:1 relationship)
+      - Query recent Conversations (last 10) for context
+      - Return user context object
+    input:
+      - hashed_user_id: string
+    output:
+      - user: User object (or None if new user)
+      - impression: Impression object (or None if new user)
+      - recent_conversations: array of Conversation objects
+
+  step3_query_song:
+    description: |
+      - Extract song name from message (if present)
+      - Query in-memory song cache with fuzzy matching (rapidfuzz)
+      - Return song data (difficulty, BPM, metadata) or None
+      - Fallback to cached data if taikowiki API unavailable
+    input:
+      - message: string
+    output:
+      - song_data: object (or None if no match)
+
+  step4_invoke_llm:
+    description: |
+      - Construct themed prompt using prompts.py templates
+      - Include user context, song data, conversation history
+      - Call OpenRouter API with gpt-4o model
+      - Handle multi-modal images if present
+      - Return LLM response with Taiko-themed content
+    input:
+      - parsed_data: object
+      - user_context: object
+      - song_data: object (optional)
+      - images: array (optional)
+    output:
+      - response: string
+      - tokens_used: number
+
+  step5_update_impression:
+    description: |
+      - Create or update User record
+      - Create or update Impression record (increment interaction_count, update preferences)
+      - Create Conversation record with message/response
+      - Update relationship_status based on interaction_count
+    input:
+      - hashed_user_id: string
+      - group_id: string
+      - message: string
+      - response: string
+      - user_context: object
+    output:
+      - success: boolean
+
+fallbacks:
+  return_empty_song_data:
+    description: Return empty song data if taikowiki query fails
+    returns:
+      song_data: null
+
+  return_default_response:
+    description: Return default themed response if LLM fails
+    returns:
+      response: "Don! Mika is having trouble right now. Please try again later! 🥁"

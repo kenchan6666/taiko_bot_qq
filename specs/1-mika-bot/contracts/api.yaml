@@ -1,0 +1,170 @@
+openapi: 3.0.3
+info:
+  title: Mika Taiko Chatbot API
+  version: 1.0.0
+  description: FastAPI backend for Mika Taiko no Tatsujin QQ chatbot
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+  - url: https://api.mika-bot.example.com
+    description: Production server
+
+paths:
+  /webhook/langbot:
+    post:
+      summary: LangBot webhook endpoint
+      description: Receives messages from LangBot when "Mika" is mentioned in QQ groups
+      operationId: langbot_webhook
+      tags:
+        - webhooks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - group_id
+                - user_id
+                - message
+              properties:
+                group_id:
+                  type: string
+                  description: QQ group ID where message was sent
+                  example: "123456789"
+                user_id:
+                  type: string
+                  description: QQ user ID (will be hashed before storage)
+                  example: "987654321"
+                message:
+                  type: string
+                  description: User's message content
+                  example: "Mika, what's the BPM of 千本桜?"
+                images:
+                  type: array
+                  items:
+                    type: string
+                    format: base64
+                  description: Optional base64-encoded images
+                  example: []
+                timestamp:
+                  type: string
+                  format: date-time
+                  description: Message timestamp (optional, defaults to now)
+      responses:
+        '200':
+          description: Message processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  response:
+                    type: string
+                    example: "千本桜的BPM是180，是一首10星难度的超快节奏歌曲！🥁 Don! Don! Don!"
+                  workflow_id:
+                    type: string
+                    description: Temporal workflow execution ID
+                    example: "workflow-abc123"
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Rate limit exceeded. Please try again later."
+                  retry_after:
+                    type: integer
+                    description: Seconds to wait before retrying
+                    example: 60
+        '400':
+          description: Bad request (invalid message format or filtered content)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Message contains inappropriate content"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
+
+  /health:
+    get:
+      summary: Health check endpoint
+      description: Returns service health status
+      operationId: health_check
+      tags:
+        - monitoring
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "healthy"
+                  services:
+                    type: object
+                    properties:
+                      mongodb:
+                        type: string
+                        example: "connected"
+                      temporal:
+                        type: string
+                        example: "connected"
+                      openrouter:
+                        type: string
+                        example: "available"
+
+  /metrics:
+    get:
+      summary: Metrics endpoint
+      description: Returns system metrics (optional, for monitoring)
+      operationId: get_metrics
+      tags:
+        - monitoring
+      responses:
+        '200':
+          description: Metrics data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_requests:
+                    type: integer
+                  rate_limit_hits:
+                    type: integer
+                  average_response_time:
+                    type: number
+                    format: float
+
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        details:
+          type: string
+          nullable: true
