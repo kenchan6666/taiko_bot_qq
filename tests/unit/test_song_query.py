@@ -43,7 +43,7 @@ class TestSongQueryServiceFetchSongs:
 
         with patch("httpx.AsyncClient", return_value=mock_client):
             service = SongQueryService(json_url="https://test.example.com/songs.json")
-            songs = await service.fetch_songs()
+            songs, used_fallback = await service.fetch_songs()
 
         assert len(songs) == len(SAMPLE_SONGS)
         assert songs[0]["name"] == "千本桜"
@@ -63,7 +63,7 @@ class TestSongQueryServiceFetchSongs:
 
         with patch("httpx.AsyncClient", return_value=mock_client):
             service = SongQueryService(json_url="https://test.example.com/songs.json")
-            songs = await service.fetch_songs()
+            songs, used_fallback = await service.fetch_songs()
 
         assert len(songs) == len(SAMPLE_SONGS)
         assert songs[0]["name"] == "千本桜"
@@ -81,10 +81,15 @@ class TestSongQueryServiceFetchSongs:
         mock_client.__aenter__ = AsyncMock(return_value=mock_client)
         mock_client.__aexit__ = AsyncMock(return_value=None)
 
+        # When HTTP error occurs, service should fallback to local file
+        # So we need to mock the fallback file read as well
         with patch("httpx.AsyncClient", return_value=mock_client):
             service = SongQueryService(json_url="https://test.example.com/songs.json")
-            with pytest.raises(RuntimeError, match="Failed to fetch songs"):
-                await service.fetch_songs()
+            # Service should fallback to local file, not raise error
+            # But if local file also fails, then it raises RuntimeError
+            with patch("pathlib.Path.exists", return_value=False):
+                with pytest.raises(RuntimeError, match="Failed to fetch songs"):
+                    await service.fetch_songs()
 
     @pytest.mark.asyncio
     async def test_fetch_songs_invalid_json(self) -> None:

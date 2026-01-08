@@ -198,10 +198,10 @@
 
 ### Memory Enhancement
 
-- [ ] T053 [US3] Update src/steps/step2.py to retrieve recent conversations using configurable limit via env var `CONVERSATION_HISTORY_LIMIT` (default 10) for context (Effort: 2h)
-- [ ] T054 [US3] Update src/steps/step4.py to include conversation history in LLM prompt using memory-aware template from PromptManager (Effort: 2h)
-- [ ] T055 [US3] Enhance src/steps/step5.py with impression learning logic (extract preferences, update relationship_status) and confirmation flow: ask user for confirmation, prioritize explicit “是/对/yes/correct”, allow implicit if user continues assuming preference is correct (Effort: 3h)
-- [ ] T056 [US3] Add memory-aware prompt templates to src/prompts.py using PromptManager API (Effort: 1.5h)
+- [x] T053 [US3] Update src/steps/step2.py to retrieve recent conversations using configurable limit via env var `CONVERSATION_HISTORY_LIMIT` (default 10) for context (Effort: 2h)
+- [x] T054 [US3] Update src/steps/step4.py to include conversation history in LLM prompt using memory-aware template from PromptManager (Effort: 2h)
+- [x] T055 [US3] Enhance src/steps/step5.py with impression learning logic (extract preferences, update relationship_status) and confirmation flow: ask user for confirmation, prioritize explicit “是/对/yes/correct”, allow implicit if user continues assuming preference is correct (Effort: 3h)
+- [x] T056 [US3] Add memory-aware prompt templates to src/prompts.py using PromptManager API (Effort: 1.5h)
 
 ### User Notification
 
@@ -209,8 +209,8 @@
 
 ### Testing
 
-- [ ] T058 [P] [US3] Create tests/unit/test_memory.py with impression update and context retrieval tests, covering configurable history limit, explicit/implicit preference confirmation, and unconfirmed preference handling (pending state, natural re-confirmation) (Effort: 3h)
-- [ ] T059 [US3] Create tests/integration/test_memory_flow.py with multi-conversation memory tests, including confirmation flows and preference persistence (Effort: 2h)
+- [x] T058 [P] [US3] Create tests/unit/test_memory.py with impression update and context retrieval tests, covering configurable history limit, explicit/implicit preference confirmation, and unconfirmed preference handling (pending state, natural re-confirmation) (Effort: 3h)
+- [x] T059 [US3] Create tests/integration/test_memory_flow.py with multi-conversation memory tests, including confirmation flows and preference persistence (Effort: 2h)
 
 **Checkpoint**: Bot remembers user preferences and references past conversations
 
@@ -226,15 +226,15 @@
 
 ### Multi-Modal Support
 
-- [ ] T060 [US4] Update src/steps/step1.py to handle image data from LangBot webhook with validation (10MB limit, JPEG/PNG/WebP formats per FR-006) (Effort: 2h)
-- [ ] T061 [US4] Update src/services/llm.py to support multi-modal requests (base64 image encoding) (Effort: 2h)
-- [ ] T062 [US4] Update src/steps/step4.py to include images in OpenRouter API call using image analysis template from PromptManager; provide detailed analysis for Taiko images (song, difficulty, score) and themed response for non-Taiko images (Effort: 2h)
-- [ ] T063 [US4] Add image analysis prompt templates to src/prompts.py using PromptManager API for Taiko-detailed analysis and non-Taiko themed response per FR-006 (Effort: 1.5h)
+- [x] T060 [US4] Update src/steps/step1.py to handle image data from LangBot webhook with validation (10MB limit, JPEG/PNG/WebP formats per FR-006) (Effort: 2h)
+- [x] T061 [US4] Update src/services/llm.py to support multi-modal requests (base64 image encoding) (Effort: 2h)
+- [x] T062 [US4] Update src/steps/step4.py to include images in OpenRouter API call using image analysis template from PromptManager; provide detailed analysis for Taiko images (song, difficulty, score) and themed response for non-Taiko images (Effort: 2h)
+- [x] T063 [US4] Add image analysis prompt templates to src/prompts.py using PromptManager API for Taiko-detailed analysis and non-Taiko themed response per FR-006 (Effort: 1.5h)
 
 ### Testing
 
-- [ ] T064 [P] [US4] Create tests/unit/test_multimodal.py with image processing tests (Effort: 2h)
-- [ ] T065 [US4] Create tests/integration/test_image_flow.py with end-to-end image processing tests (Effort: 2h)
+- [x] T064 [P] [US4] Create tests/unit/test_multimodal.py with image processing tests (Effort: 2h)
+- [x] T065 [US4] Create tests/integration/test_image_flow.py with end-to-end image processing tests (Effort: 2h)
 
 **Checkpoint**: Bot processes images and provides themed responses
 

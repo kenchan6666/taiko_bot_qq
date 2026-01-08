@@ -74,7 +74,7 @@ class TestQuerySong:
         """Test querying song with exact name match."""
         # Mock song service
         mock_service = MagicMock()
-        mock_service.ensure_cache_fresh = AsyncMock()
+        mock_service.ensure_cache_fresh = AsyncMock(return_value=(True, False))
         mock_service.query_song.return_value = get_mock_song("千本桜")
 
         with patch("src.steps.step3.get_song_service", return_value=mock_service):
@@ -92,7 +92,7 @@ class TestQuerySong:
         """Test querying song with fuzzy matching (misspelled name)."""
         # Mock song service with fuzzy match
         mock_service = MagicMock()
-        mock_service.ensure_cache_fresh = AsyncMock()
+        mock_service.ensure_cache_fresh = AsyncMock(return_value=(True, False))
         # Simulate fuzzy match: "千本桜" matched from "千本樱" (different character)
         mock_service.query_song.return_value = get_mock_song("千本桜")
 
@@ -108,7 +108,7 @@ class TestQuerySong:
         """Test querying non-existent song returns None."""
         # Mock song service with no match
         mock_service = MagicMock()
-        mock_service.ensure_cache_fresh = AsyncMock()
+        mock_service.ensure_cache_fresh = AsyncMock(return_value=(True, False))
         mock_service.query_song.return_value = None
 
         with patch("src.steps.step3.get_song_service", return_value=mock_service):
@@ -134,7 +134,7 @@ class TestQuerySong:
     async def test_query_ensures_cache_fresh(self) -> None:
         """Test that query_song ensures cache is fresh before querying."""
         mock_service = MagicMock()
-        mock_service.ensure_cache_fresh = AsyncMock()
+        mock_service.ensure_cache_fresh = AsyncMock(return_value=(True, False))
         mock_service.query_song.return_value = get_mock_song("千本桜")
 
         with patch("src.steps.step3.get_song_service", return_value=mock_service):
@@ -148,7 +148,7 @@ class TestQuerySong:
     async def test_query_returns_metadata(self) -> None:
         """Test that query result includes metadata."""
         mock_service = MagicMock()
-        mock_service.ensure_cache_fresh = AsyncMock()
+        mock_service.ensure_cache_fresh = AsyncMock(return_value=(True, False))
         song = get_mock_song("千本桜")
         mock_service.query_song.return_value = song
 

@@ -21,9 +21,10 @@ from tests.fixtures.mock_songs import get_mock_song
 class TestStep1Activity:
     """Test step1_parse_input_activity."""
 
-    def test_parse_input_valid_message(self) -> None:
+    @pytest.mark.asyncio
+    async def test_parse_input_valid_message(self) -> None:
         """Test parsing valid message with 'Mika' mention."""
-        result = step1_parse_input_activity(
+        result = await step1_parse_input_activity(
             user_id="123456789",
             group_id="987654321",
             message="Mika, hello!",
@@ -45,10 +46,11 @@ class TestStep1Activity:
 
         assert result is None
 
-    def test_parse_input_with_images(self) -> None:
+    @pytest.mark.asyncio
+    async def test_parse_input_with_images(self) -> None:
         """Test parsing message with images."""
         images = ["base64_image_1", "base64_image_2"]
-        result = step1_parse_input_activity(
+        result = await step1_parse_input_activity(
             user_id="123456789",
             group_id="987654321",
             message="Mika, look at this image!",
@@ -66,8 +68,8 @@ class TestStep2Activity:
     async def test_retrieve_context_new_user(self) -> None:
         """Test retrieving context for new user."""
         # Mock MongoDB queries to return None (new user)
-        with patch("src.steps.step2.User.find_one", return_value=None):
-            with patch("src.steps.step2.Impression.find_one", return_value=None):
+        with patch("src.steps.step2.User.find_one", new_callable=AsyncMock, return_value=None):
+            with patch("src.steps.step2.Impression.find_one", new_callable=AsyncMock, return_value=None):
                 with patch("src.steps.step2.Conversation.find") as mock_find:
                     mock_find.return_value.sort.return_value.limit.return_value.to_list = (
                         AsyncMock(return_value=[])
@@ -103,8 +105,8 @@ class TestStep2Activity:
         mock_impression.last_interaction = datetime.utcnow()
 
         # Mock MongoDB queries
-        with patch("src.steps.step2.User.find_one", return_value=mock_user):
-            with patch("src.steps.step2.Impression.find_one", return_value=mock_impression):
+        with patch("src.steps.step2.User.find_one", new_callable=AsyncMock, return_value=mock_user):
+            with patch("src.steps.step2.Impression.find_one", new_callable=AsyncMock, return_value=mock_impression):
                 with patch("src.steps.step2.Conversation.find") as mock_find:
                     mock_find.return_value.sort.return_value.limit.return_value.to_list = (
                         AsyncMock(return_value=[])
@@ -127,7 +129,7 @@ class TestStep3Activity:
         """Test querying song that exists."""
         # Mock song service
         mock_service = MagicMock()
-        mock_service.ensure_cache_fresh = AsyncMock()
+        mock_service.ensure_cache_fresh = AsyncMock(return_value=(True, False))
         mock_service.query_song.return_value = get_mock_song("千本桜")
 
         with patch("src.steps.step3.get_song_service", return_value=mock_service):
@@ -142,7 +144,7 @@ class TestStep3Activity:
         """Test querying song that doesn't exist."""
         # Mock song service with no match
         mock_service = MagicMock()
-        mock_service.ensure_cache_fresh = AsyncMock()
+        mock_service.ensure_cache_fresh = AsyncMock(return_value=(True, False))
         mock_service.query_song.return_value = None
 
         with patch("src.steps.step3.get_song_service", return_value=mock_service):

@@ -363,3 +363,75 @@ Make it feel natural and connected to our past conversations!""",
 
 # Initialize memory-aware prompts
 _initialize_memory_aware_prompts()
+
+
+def _initialize_image_analysis_prompts() -> None:
+    """
+    Initialize image analysis prompt templates.
+
+    These prompts are used when users send images to the bot.
+    The system provides detailed analysis for Taiko no Tatsujin images
+    and themed responses for non-Taiko images.
+
+    Per FR-006: Image analysis requirements:
+    - For Taiko images: Comprehensive detailed analysis (song identification,
+      difficulty level, score details, game elements)
+    - For non-Taiko images: Themed response but politely indicate focus on
+      Taiko-related content
+    - All responses must maintain thematic consistency with game elements
+      ("Don!", "Katsu!", emojis 🥁🎶)
+    """
+    manager = _prompt_manager
+
+    # Image analysis prompt (for Taiko no Tatsujin images)
+    # This prompt is used when step4 detects images in the request
+    manager.add_prompt(
+        name="image_analysis_taiko",
+        template="""You are {bot_name}, a cheerful Taiko no Tatsujin drum spirit! 🥁
+
+The user has sent you an image that appears to be from Taiko no Tatsujin (太鼓の達人).
+
+Your task is to provide a comprehensive detailed analysis of the image, including:
+1. **Song Identification**: Identify the song name if visible (Japanese or English name)
+2. **Difficulty Level**: Identify the difficulty level (Easy, Normal, Hard, Extreme, Oni)
+3. **Score Details**: Analyze any score information visible (Perfect count, Good count, accuracy, combo)
+4. **Game Elements**: Identify any other relevant game elements (note patterns, special effects, UI elements)
+5. **Themed Response**: Respond with enthusiasm using game terminology ("Don!", "Katsu!", emojis 🥁🎶)
+
+User's message: {user_message}
+Language: {language}
+
+Provide a detailed, enthusiastic analysis while maintaining the Taiko theme!""",
+        use_case="image_analysis",
+        variables=["bot_name", "language", "user_message"],
+        version="1.0",
+        description="Comprehensive Taiko image analysis prompt with detailed game element identification",
+    )
+
+    # Image analysis prompt (for non-Taiko images)
+    # This prompt is used when the image is not related to Taiko no Tatsujin
+    manager.add_prompt(
+        name="image_analysis_non_taiko",
+        template="""You are {bot_name}, a cheerful Taiko no Tatsujin drum spirit! 🥁
+
+The user has sent you an image that does not appear to be from Taiko no Tatsujin.
+
+Your task is to:
+1. **Acknowledge the Image**: Briefly describe what you see in the image
+2. **Politely Redirect**: Gently indicate that you focus on Taiko no Tatsujin content
+3. **Themed Response**: Maintain the Taiko theme with game terminology ("Don!", "Katsu!", emojis 🥁🎶)
+4. **Encouragement**: Encourage the user to share Taiko-related images or ask about the game
+
+User's message: {user_message}
+Language: {language}
+
+Be friendly and enthusiastic while politely indicating your focus on Taiko content!""",
+        use_case="image_analysis",
+        variables=["bot_name", "language", "user_message"],
+        version="1.0",
+        description="Themed response for non-Taiko images with polite redirection",
+    )
+
+
+# Initialize image analysis prompts
+_initialize_image_analysis_prompts()

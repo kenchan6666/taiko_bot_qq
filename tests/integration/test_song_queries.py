@@ -27,7 +27,7 @@ class TestEndToEndSongQuery:
         """
         # Mock song service
         mock_service = MagicMock()
-        mock_service.ensure_cache_fresh = AsyncMock()
+        mock_service.ensure_cache_fresh = AsyncMock(return_value=(True, False))
         mock_service.query_song.return_value = get_mock_song("千本桜")
 
         with patch("src.steps.step3.get_song_service", return_value=mock_service):
@@ -51,7 +51,7 @@ class TestEndToEndSongQuery:
         """Test end-to-end flow with fuzzy matching for misspelled song name."""
         # Mock service with fuzzy match result
         mock_service = MagicMock()
-        mock_service.ensure_cache_fresh = AsyncMock()
+        mock_service.ensure_cache_fresh = AsyncMock(return_value=(True, False))
         # Simulate fuzzy match: "千本樱" (different character) matches "千本桜"
         mock_service.query_song.return_value = get_mock_song("千本桜")
 
@@ -69,7 +69,7 @@ class TestEndToEndSongQuery:
         """Test handling when song is not found."""
         # Mock service with no match
         mock_service = MagicMock()
-        mock_service.ensure_cache_fresh = AsyncMock()
+        mock_service.ensure_cache_fresh = AsyncMock(return_value=(True, False))
         mock_service.query_song.return_value = None
 
         with patch("src.steps.step3.get_song_service", return_value=mock_service):
@@ -84,7 +84,7 @@ class TestEndToEndSongQuery:
     async def test_multiple_song_queries(self) -> None:
         """Test multiple song queries in sequence."""
         mock_service = MagicMock()
-        mock_service.ensure_cache_fresh = AsyncMock()
+        mock_service.ensure_cache_fresh = AsyncMock(return_value=(True, False))
 
         # First query: 千本桜
         mock_service.query_song.side_effect = [
@@ -106,7 +106,7 @@ class TestEndToEndSongQuery:
     async def test_song_query_with_different_query_patterns(self) -> None:
         """Test that different query patterns all work correctly."""
         mock_service = MagicMock()
-        mock_service.ensure_cache_fresh = AsyncMock()
+        mock_service.ensure_cache_fresh = AsyncMock(return_value=(True, False))
         mock_service.query_song.return_value = get_mock_song("千本桜")
 
         query_patterns = [
@@ -130,7 +130,7 @@ class TestEndToEndSongQuery:
     async def test_song_query_cache_refresh_integration(self) -> None:
         """Test that cache refresh happens before querying."""
         mock_service = MagicMock()
-        mock_service.ensure_cache_fresh = AsyncMock()
+        mock_service.ensure_cache_fresh = AsyncMock(return_value=(True, False))
         mock_service.query_song.return_value = get_mock_song("千本桜")
 
         with patch("src.steps.step3.get_song_service", return_value=mock_service):
@@ -145,7 +145,7 @@ class TestEndToEndSongQuery:
     async def test_song_query_metadata_preservation(self) -> None:
         """Test that song metadata is preserved in query result."""
         mock_service = MagicMock()
-        mock_service.ensure_cache_fresh = AsyncMock()
+        mock_service.ensure_cache_fresh = AsyncMock(return_value=(True, False))
         song = get_mock_song("千本桜")
         mock_service.query_song.return_value = song
 

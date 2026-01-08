@@ -56,10 +56,43 @@ async def invoke_llm(
     # Get bot name from config
     bot_name = get_bot_name()
 
+    # Check if images are provided (multi-modal request)
+    # Per FR-006: Use image analysis prompts when images are present
+    has_images = bool(parsed_input.images and len(parsed_input.images) > 0)
+
     # Build prompt using PromptManager
-    # Use "song_query" prompt if song_info is available, otherwise "general_chat"
+    # Priority: images > song_info > memory_aware > general_chat
     try:
-        if song_info:
+        if has_images:
+            # Multi-modal request: Use image analysis prompt
+            # Per FR-006: Provide detailed analysis for Taiko images,
+            # themed response for non-Taiko images
+            # The LLM will analyze the image and determine if it's Taiko-related
+            try:
+                # Use image analysis prompt (LLM will determine Taiko vs non-Taiko)
+                # We use image_analysis_taiko as the primary prompt, which instructs
+                # the LLM to provide detailed analysis for Taiko images
+                prompt = prompt_manager.get_prompt(
+                    name="image_analysis_taiko",
+                    bot_name=bot_name,
+                    language=parsed_input.language,
+                    user_message=parsed_input.message or (
+                        "请分析这张图片" if parsed_input.language == "zh" else "Please analyze this image"
+                    ),
+                )
+            except ValueError:
+                # Image analysis prompt not found - use fallback
+                # Per FR-009: Graceful degradation
+                prompt = f"""You are {bot_name}, a cheerful Taiko no Tatsujin drum spirit! 🥁
+
+The user has sent you an image. Please analyze it:
+- If it's a Taiko no Tatsujin screenshot: Provide detailed analysis (song name, difficulty, score, game elements)
+- If it's not Taiko-related: Politely indicate you focus on Taiko content, but still be friendly
+
+User message: {parsed_input.message or ("请分析这张图片" if parsed_input.language == "zh" else "Please analyze this image")}
+
+Respond with themed content using game terminology ("Don!", "Katsu!", emojis 🥁🎶)."""
+        elif song_info:
             # Song query detected - use song_query prompt
             # Format metadata for prompt
             metadata_text = ""

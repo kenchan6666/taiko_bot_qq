@@ -41,11 +41,12 @@ def extract_song_query(message: str) -> Optional[str]:
         return None
 
     # Common song query patterns
+    # Order matters: more specific patterns first
     patterns = [
         r"(?:BPM|bpm|速度|节奏).*?[：:]\s*([^\?。！!?]+)",  # "BPM: 千本桜"
         r"(?:难度|difficulty|stars).*?[：:]\s*([^\?。！!?]+)",  # "难度: 千本桜"
-        r"(?:关于|about|tell me about|what.*?about)\s+([^\?。！!?]+)",  # "关于 千本桜"
-        r"(?:的|of|'s)\s+([^\?。！!?]+)\s+(?:BPM|bpm|难度|difficulty)",  # "千本桜的BPM"
+        r"(?:what's|what is)\s+(?:the\s+)?(?:BPM|bpm|难度|difficulty)\s+of\s+([^\?。！!?]+)",  # "What's the BPM of 千本桜?"
+        r"(?:关于|about|tell me about|what.*?about)\s+([^\?。！]+)",  # "关于 千本桜" or "Tell me about Bad Apple!!"
         r"([^\?。！!?]+)\s*(?:的|of)\s*(?:BPM|bpm|难度|difficulty)",  # "千本桜的BPM"
     ]
 

@@ -88,6 +88,11 @@ class Settings(BaseSettings):
     message_deduplication_similarity_threshold: float = 0.85  # 0.0-1.0, higher = more strict
     message_deduplication_window_seconds: int = 5  # Time window for deduplication
 
+    # Image Processing Configuration
+    # Per FR-006: Image processing limits (10MB max, JPEG/PNG/WebP only)
+    image_max_size_mb: int = 10  # Maximum image size in MB
+    image_allowed_formats: list[str] = ["jpeg", "jpg", "png", "webp"]  # Allowed image formats
+
     def get_langbot_allowed_groups_list(self) -> list[str]:
         """
         Parse comma-separated allowed groups string into a list.

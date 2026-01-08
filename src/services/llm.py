@@ -8,6 +8,7 @@ Per FR-006: Support multi-modal image processing.
 Per FR-009: Gracefully degrade when external services are unavailable.
 """
 
+import base64
 import json
 from typing import Optional
 
@@ -108,13 +109,17 @@ class LLMService:
 
         # Add images if provided (multi-modal support)
         # Per FR-006: Support image processing
+        # Note: Images are already validated in step1.py (size and format)
         if images:
             for image_base64 in images:
+                # Detect image format for proper MIME type
+                # OpenRouter/gpt-4o supports: image/jpeg, image/png, image/webp
+                image_format = _detect_image_mime_type(image_base64)
                 user_message["content"].append(
                     {
                         "type": "image_url",
                         "image_url": {
-                            "url": f"data:image/jpeg;base64,{image_base64}",
+                            "url": f"data:{image_format};base64,{image_base64}",
                         },
                     }
                 )
@@ -159,6 +164,53 @@ class LLMService:
     async def close(self) -> None:
         """Close HTTP client."""
         await self.client.aclose()
+
+
+def _detect_image_mime_type(image_base64: str) -> str:
+    """
+    Detect image MIME type from base64-encoded image data.
+
+    Per FR-006: Support JPEG, PNG, WebP formats.
+    OpenRouter/gpt-4o requires proper MIME types: image/jpeg, image/png, image/webp.
+
+    Args:
+        image_base64: Base64-encoded image string.
+
+    Returns:
+        MIME type string (e.g., "image/jpeg", "image/png", "image/webp").
+        Defaults to "image/jpeg" if format cannot be detected.
+
+    Example:
+        >>> jpeg_base64 = "/9j/4AAQSkZJRg..."
+        >>> _detect_image_mime_type(jpeg_base64)
+        'image/jpeg'
+    """
+    try:
+        # Decode base64 to get binary data
+        image_data = base64.b64decode(image_base64, validate=True)
+
+        if not image_data or len(image_data) < 4:
+            return "image/jpeg"  # Default fallback
+
+        # Check JPEG: Starts with FF D8 FF
+        if image_data[:3] == b"\xff\xd8\xff":
+            return "image/jpeg"
+
+        # Check PNG: Starts with 89 50 4E 47
+        if image_data[:4] == b"\x89PNG":
+            return "image/png"
+
+        # Check WebP: Starts with RIFF...WEBP
+        if len(image_data) >= 12:
+            if image_data[:4] == b"RIFF" and image_data[8:12] == b"WEBP":
+                return "image/webp"
+
+        # Format not recognized - default to JPEG
+        return "image/jpeg"
+
+    except Exception:
+        # Decoding failed - default to JPEG
+        return "image/jpeg"
 
 
 # Global LLM service instance
