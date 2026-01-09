@@ -12,6 +12,7 @@ Per T047: Create src/workflows/message_workflow.py with process_message_workflow
 Per T048: Configure retry policies (exponential backoff: 1s, 2s, 4s, 8s, max 5 attempts).
 """
 
+from datetime import timedelta
 from typing import Optional
 
 from temporalio import workflow
@@ -27,9 +28,9 @@ from src.activities.step5_activity import step5_update_impression_activity
 # Retry policy configuration
 # Per FR-009: Exponential backoff retry (1s, 2s, 4s, 8s intervals, max 5 attempts)
 RETRY_POLICY = RetryPolicy(
-    initial_interval=1.0,  # 1 second
+    initial_interval=timedelta(seconds=1),  # 1 second
     backoff_coefficient=2.0,  # Double each time: 1s, 2s, 4s, 8s
-    maximum_interval=8.0,  # Maximum 8 seconds
+    maximum_interval=timedelta(seconds=8),  # Maximum 8 seconds
     maximum_attempts=5,  # Max 5 retry attempts
 )
 
@@ -96,11 +97,8 @@ class ProcessMessageWorkflow:
         # Per FR-011: User ID hashing
         parsed_input_dict = await workflow.execute_activity(
             step1_parse_input_activity,
-            user_id,
-            group_id,
-            message,
-            images,
-            start_to_close_timeout=30.0,  # 30 second timeout
+            args=[user_id, group_id, message, images],
+            start_to_close_timeout=timedelta(seconds=30),  # 30 second timeout
             retry_policy=RETRY_POLICY,
         )
 
@@ -119,8 +117,8 @@ class ProcessMessageWorkflow:
         # Per FR-005: Retrieve conversation history for context
         context_dict = await workflow.execute_activity(
             step2_retrieve_context_activity,
-            parsed_input_dict["hashed_user_id"],
-            start_to_close_timeout=30.0,  # 30 second timeout
+            args=[parsed_input_dict["hashed_user_id"]],
+            start_to_close_timeout=timedelta(seconds=30),  # 30 second timeout
             retry_policy=RETRY_POLICY,
         )
 
@@ -128,8 +126,8 @@ class ProcessMessageWorkflow:
         # Per FR-002: Query song data with fuzzy matching
         song_info = await workflow.execute_activity(
             step3_query_song_activity,
-            parsed_input_dict["message"],
-            start_to_close_timeout=30.0,  # 30 second timeout
+            args=[parsed_input_dict["message"]],
+            start_to_close_timeout=timedelta(seconds=30),  # 30 second timeout
             retry_policy=RETRY_POLICY,
         )
 
@@ -139,15 +137,15 @@ class ProcessMessageWorkflow:
         try:
             response = await workflow.execute_activity(
                 step4_invoke_llm_activity,
-                parsed_input_dict,
-                context_dict,
-                song_info,
-                start_to_close_timeout=60.0,  # 60 second timeout (LLM can be slow)
+                args=[parsed_input_dict, context_dict, song_info],
+                start_to_close_timeout=timedelta(seconds=60),  # 60 second timeout (LLM can be slow)
                 retry_policy=RETRY_POLICY,
             )
-        except Exception:
+        except Exception as llm_error:
             # Per FR-009: Graceful degradation
             # Return fallback response if LLM fails
+            # Note: Cannot use logger in workflow (Temporal sandbox restrictions)
+            # Error details will be logged in the activity that raised the exception
             response = "Don! Mika暂时无法回应，但我会尽快回来的！🥁"
 
         # Step 5: Update impression and save conversation
@@ -155,10 +153,8 @@ class ProcessMessageWorkflow:
         # Per FR-010: Update impression when bot learns
         impression_update = await workflow.execute_activity(
             step5_update_impression_activity,
-            parsed_input_dict,
-            context_dict,
-            response,
-            start_to_close_timeout=30.0,  # 30 second timeout
+            args=[parsed_input_dict, context_dict, response],
+            start_to_close_timeout=timedelta(seconds=30),  # 30 second timeout
             retry_policy=RETRY_POLICY,
         )
 

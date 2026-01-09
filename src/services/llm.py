@@ -13,8 +13,11 @@ import json
 from typing import Optional
 
 import httpx
+import structlog
 
 from src.config import settings
+
+logger = structlog.get_logger()
 
 
 class LLMService:
@@ -135,11 +138,29 @@ class LLMService:
         }
 
         try:
+            # Log API request (without sensitive data)
+            logger.info(
+                "llm_api_request_starting",
+                model=self.model,
+                has_images=bool(images),
+                prompt_length=len(prompt),
+                max_tokens=max_tokens,
+                temperature=temperature,
+            )
+
             # Make API request
             response = await self.client.post(
                 self.api_url,
                 json=payload,
             )
+
+            # Log response status
+            logger.debug(
+                "llm_api_response_received",
+                status_code=response.status_code,
+                response_length=len(response.content) if response.content else 0,
+            )
+
             response.raise_for_status()
 
             # Parse response
@@ -154,12 +175,56 @@ class LLMService:
                 raise ValueError("Invalid API response: no content found")
 
             generated_text = choice["message"]["content"]
+
+            # Log successful response
+            logger.info(
+                "llm_api_request_success",
+                response_length=len(generated_text),
+                response_preview=generated_text[:100],
+                usage=response_data.get("usage", {}),
+            )
+
             return generated_text.strip()
 
-        except httpx.HTTPError as e:
+        except httpx.HTTPStatusError as e:
+            # HTTP error with status code (4xx, 5xx)
+            error_detail = None
+            try:
+                error_detail = e.response.json() if e.response.content else None
+            except Exception:
+                error_detail = e.response.text[:500] if e.response.text else None
+
+            logger.error(
+                "llm_api_request_failed",
+                status_code=e.response.status_code,
+                error=str(e),
+                error_detail=error_detail,
+                model=self.model,
+            )
             # Per FR-009: Graceful degradation
             # Log error and raise for caller to handle
             raise RuntimeError(f"OpenRouter API request failed: {e}") from e
+
+        except httpx.HTTPError as e:
+            # Network/connection errors
+            logger.error(
+                "llm_api_request_network_error",
+                error=str(e),
+                error_type=type(e).__name__,
+                model=self.model,
+            )
+            # Per FR-009: Graceful degradation
+            # Log error and raise for caller to handle
+            raise RuntimeError(f"OpenRouter API request failed: {e}") from e
+
+        except ValueError as e:
+            # Response parsing errors
+            logger.error(
+                "llm_api_response_parse_error",
+                error=str(e),
+                model=self.model,
+            )
+            raise
 
     async def close(self) -> None:
         """Close HTTP client."""

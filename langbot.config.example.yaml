@@ -1,0 +1,59 @@
+# LangBot Configuration Example
+# 
+# This is an example configuration file for LangBot integration with Mika Taiko Chatbot.
+# Copy this file to your LangBot configuration directory and customize as needed.
+#
+# Per T066: LangBot keyword trigger pattern for "Mika" variants
+
+# LangBot Bot Configuration
+bot:
+  name: "Mika"
+  description: "Taiko no Tatsujin themed QQ chatbot"
+
+# Keyword Triggers
+# Per T066: Pattern matches "Mika", "米卡", "mika酱" (case-insensitive)
+triggers:
+  - type: keyword
+    # Regex pattern: (?i) makes it case-insensitive
+    # Matches: mika, Mika, MIKA, 米卡, mika酱, etc.
+    pattern: "(?i)(mika|米卡|mika酱)"
+    # Webhook URL: Replace with your actual FastAPI backend URL
+    # For local development with ngrok: https://abc123.ngrok.io/webhook/langbot
+    # For production: https://api.yourdomain.com/webhook/langbot
+    webhook_url: "http://localhost:8000/webhook/langbot"
+    # Enable trigger for both group and private messages
+    enabled: true
+
+# Group Whitelist Configuration
+# Per T067: Configure allowed groups via environment variable or config file
+# If not configured, all groups are allowed
+# Format: Comma-separated list of QQ group IDs
+allowed_groups:
+  # Example: Allow specific groups
+  # - "123456789"
+  # - "987654321"
+  # Or leave empty to allow all groups (not recommended for production)
+
+# Alternative: Use environment variable
+# Set LANGBOT_ALLOWED_GROUPS="123456789,987654321" in your environment
+
+# Webhook Configuration
+webhook:
+  # Timeout for webhook requests (seconds)
+  timeout: 30
+  # Retry configuration
+  retry:
+    max_attempts: 3
+    backoff_seconds: 2
+
+# Logging Configuration
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  format: "json"  # json or text
+
+# Notes:
+# 1. Replace webhook_url with your actual FastAPI backend URL
+# 2. For local development, use ngrok or similar tunneling service
+# 3. For production, use public domain/IP with HTTPS (recommended)
+# 4. Configure allowed_groups to restrict bot access to specific QQ groups
+# 5. See quickstart.md and WEBHOOK_SETUP_GUIDE.md for detailed setup instructions

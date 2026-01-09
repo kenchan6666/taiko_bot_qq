@@ -20,8 +20,10 @@ from src.activities.step2_activity import step2_retrieve_context_activity
 from src.activities.step3_activity import step3_query_song_activity
 from src.activities.step4_activity import step4_invoke_llm_activity
 from src.activities.step5_activity import step5_update_impression_activity
+from src.activities.cleanup_activity import cleanup_old_conversations_activity
 from src.config import settings
 from src.workflows.message_workflow import ProcessMessageWorkflow
+from src.workflows.cleanup_workflow import CleanupConversationsWorkflow
 
 logger = structlog.get_logger()
 
@@ -96,13 +98,14 @@ async def run_worker(task_queue: str = "mika-bot-task-queue") -> None:
     worker = Worker(
         client,
         task_queue=task_queue,
-        workflows=[ProcessMessageWorkflow],
+        workflows=[ProcessMessageWorkflow, CleanupConversationsWorkflow],
         activities=[
             step1_parse_input_activity,
             step2_retrieve_context_activity,
             step3_query_song_activity,
             step4_invoke_llm_activity,
             step5_update_impression_activity,
+            cleanup_old_conversations_activity,
         ],
         workflow_runner=SandboxedWorkflowRunner(restrictions=restrictions),
     )
@@ -110,8 +113,8 @@ async def run_worker(task_queue: str = "mika-bot-task-queue") -> None:
     logger.info(
         "temporal_worker_started",
         task_queue=task_queue,
-        workflows=["ProcessMessageWorkflow"],
-        activities_count=5,
+        workflows=["ProcessMessageWorkflow", "CleanupConversationsWorkflow"],
+        activities_count=6,
     )
 
     # Run worker (blocks until interrupted)

@@ -50,6 +50,8 @@ class Settings(BaseSettings):
     # LangBot Configuration
     langbot_webhook_url: str = "http://localhost:8000/webhook/langbot"
     langbot_allowed_groups: str = ""  # Comma-separated list of group IDs
+    langbot_api_key: Optional[str] = None  # LangBot API Key for sending messages
+    langbot_api_base_url: str = "http://localhost:5300"  # LangBot API base URL (default: localhost:5300)
 
     # Application Configuration
     bot_name: str = "Mika"

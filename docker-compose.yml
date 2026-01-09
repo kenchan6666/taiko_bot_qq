@@ -1,0 +1,215 @@
+services:
+  # FastAPI Backend
+  # Per T075: Backend service that handles webhooks, calls gpt-4o, executes 5-step chain
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    container_name: mika_bot_backend
+    ports:
+      - "8000:8000"
+    environment:
+      # MongoDB Configuration
+      - MONGODB_URL=mongodb://mongodb:27017/
+      - MONGODB_DATABASE=mika_bot
+      # Temporal Configuration
+      - TEMPORAL_HOST=temporal
+      - TEMPORAL_PORT=7233
+      - TEMPORAL_NAMESPACE=default
+      # OpenRouter API (must be set via environment variable)
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      # LangBot Configuration
+      - LANGBOT_WEBHOOK_URL=${LANGBOT_WEBHOOK_URL:-http://localhost:8000/webhook/langbot}
+      - LANGBOT_ALLOWED_GROUPS=${LANGBOT_ALLOWED_GROUPS:-}
+      - LANGBOT_API_KEY=${LANGBOT_API_KEY:-}
+      - LANGBOT_API_BASE_URL=${LANGBOT_API_BASE_URL:-http://localhost:5300}
+      # Application Configuration
+      - BOT_NAME=${BOT_NAME:-Mika}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      # Rate Limiting
+      - RATE_LIMIT_USER_PER_MINUTE=${RATE_LIMIT_USER_PER_MINUTE:-20}
+      - RATE_LIMIT_GROUP_PER_MINUTE=${RATE_LIMIT_GROUP_PER_MINUTE:-50}
+      # Content Filtering
+      - CONTENT_FILTER_ENABLED=${CONTENT_FILTER_ENABLED:-true}
+      # Language Detection
+      - DEFAULT_LANGUAGE=${DEFAULT_LANGUAGE:-zh}
+      # Taiko.wiki API
+      - TAIKOWIKI_JSON_URL=${TAIKOWIKI_JSON_URL:-https://taiko.wiki/api/v1/song/all}
+      - TAIKOWIKI_LOCAL_JSON_PATH=${TAIKOWIKI_LOCAL_JSON_PATH:-data/database.json}
+      # Conversation History Limit
+      - CONVERSATION_HISTORY_LIMIT=${CONVERSATION_HISTORY_LIMIT:-10}
+      # Message Deduplication
+      - MESSAGE_DEDUPLICATION_ENABLED=${MESSAGE_DEDUPLICATION_ENABLED:-true}
+      - MESSAGE_DEDUPLICATION_SIMILARITY_THRESHOLD=${MESSAGE_DEDUPLICATION_SIMILARITY_THRESHOLD:-0.85}
+      - MESSAGE_DEDUPLICATION_WINDOW_SECONDS=${MESSAGE_DEDUPLICATION_WINDOW_SECONDS:-5}
+      # Image Processing
+      - IMAGE_MAX_SIZE_MB=${IMAGE_MAX_SIZE_MB:-10}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      temporal:
+        condition: service_healthy
+    networks:
+      - mika_bot_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Temporal Worker
+  # Per T075: Temporal worker to process workflows and activities
+  temporal-worker:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.temporal
+    container_name: mika_bot_temporal_worker
+    environment:
+      # MongoDB Configuration
+      - MONGODB_URL=mongodb://mongodb:27017/
+      - MONGODB_DATABASE=mika_bot
+      # Temporal Configuration
+      - TEMPORAL_HOST=temporal
+      - TEMPORAL_PORT=7233
+      - TEMPORAL_NAMESPACE=default
+      # OpenRouter API (must be set via environment variable)
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      # Application Configuration
+      - BOT_NAME=${BOT_NAME:-Mika}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      # Taiko.wiki API
+      - TAIKOWIKI_JSON_URL=${TAIKOWIKI_JSON_URL:-https://taiko.wiki/api/v1/song/all}
+      - TAIKOWIKI_LOCAL_JSON_PATH=${TAIKOWIKI_LOCAL_JSON_PATH:-data/database.json}
+      # Conversation History Limit
+      - CONVERSATION_HISTORY_LIMIT=${CONVERSATION_HISTORY_LIMIT:-10}
+      # Message Deduplication
+      - MESSAGE_DEDUPLICATION_ENABLED=${MESSAGE_DEDUPLICATION_ENABLED:-true}
+      - MESSAGE_DEDUPLICATION_SIMILARITY_THRESHOLD=${MESSAGE_DEDUPLICATION_SIMILARITY_THRESHOLD:-0.85}
+      - MESSAGE_DEDUPLICATION_WINDOW_SECONDS=${MESSAGE_DEDUPLICATION_WINDOW_SECONDS:-5}
+      # Image Processing
+      - IMAGE_MAX_SIZE_MB=${IMAGE_MAX_SIZE_MB:-10}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      temporal:
+        condition: service_healthy
+    networks:
+      - mika_bot_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f temporal_worker.py || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # MongoDB 数据库
+  # Per T075: MongoDB must run continuously to store user data, conversation history, and impressions
+  mongodb:
+    image: mongo:7.0
+    container_name: mika_bot_mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-admin123}
+      MONGO_INITDB_DATABASE: ${MONGODB_DATABASE:-mika_bot}
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - mika_bot_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Temporal Server (Auto-setup)
+  # Per T075: Temporal server + PostgreSQL must run continuously as workflow engine
+  temporal:
+    image: temporalio/auto-setup:1.22.0
+    container_name: mika_bot_temporal
+    ports:
+      - "7233:7233"  # Temporal gRPC
+      - "8088:8088"  # Temporal Web UI
+    environment:
+      - DB=postgresql
+      - DB_PORT=5432
+      - POSTGRES_USER=temporal
+      - POSTGRES_PWD=temporal
+      - POSTGRES_SEEDS=postgresql
+      # Note: DYNAMIC_CONFIG_FILE_PATH removed - using default config
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    networks:
+      - mika_bot_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "tctl", "--address", "localhost:7233", "cluster", "health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s  # Give Temporal time to start
+
+  # PostgreSQL (Temporal 依赖)
+  # Per T075: PostgreSQL for Temporal workflow state storage
+  postgresql:
+    image: postgres:15-alpine
+    container_name: mika_bot_postgresql
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: temporal
+      POSTGRES_PASSWORD: temporal
+      POSTGRES_DB: temporal
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+    networks:
+      - mika_bot_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U temporal"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Nginx (Optional but recommended)
+  # Per T075: Nginx strongly recommended for long-running reverse proxy with HTTPS
+  # Uncomment to enable Nginx reverse proxy
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: mika_bot_nginx
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+  #     - ./nginx/ssl:/etc/nginx/ssl:ro
+  #   depends_on:
+  #     - backend
+  #   networks:
+  #     - mika_bot_network
+  #   restart: unless-stopped
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost/health"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+
+volumes:
+  mongodb_data:
+    driver: local
+  postgresql_data:
+    driver: local
+
+networks:
+  mika_bot_network:
+    driver: bridge
+
+# Note: LangBot and Napcat are external services deployed separately
+# They are NOT included in this Docker Compose stack.
+# See EXTERNAL_SERVICES_DEPLOYMENT.md for deployment instructions.

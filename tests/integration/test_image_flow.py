@@ -94,7 +94,7 @@ class TestImageProcessingFlow:
         disable_deduplication_for_test()
         
         # Step 1: Parse input with image
-        parsed_input = parse_input(
+        parsed_input = await parse_input(
             user_id=test_user_id,
             group_id="987654321",
             message="Mika, 看看这张图片",
@@ -163,7 +163,7 @@ class TestImageProcessingFlow:
 
         # Step 1: Parse input with invalid image
         # Note: If all images fail validation, parse_input returns None
-        parsed_input = parse_input(
+        parsed_input = await parse_input(
             user_id="123456789",
             group_id="987654321",
             message="Mika, 看看这张图片",
@@ -198,7 +198,7 @@ class TestImageProcessingFlow:
         disable_deduplication_for_test()
         
         # Step 1: Parse input with multiple images
-        parsed_input = parse_input(
+        parsed_input = await parse_input(
             user_id=test_user_id,
             group_id="987654321",
             message="Mika, 看看这些图片",
@@ -258,7 +258,7 @@ class TestImageProcessingFlow:
         gif_base64 = base64.b64encode(gif_data).decode("utf-8")
 
         # Step 1: Parse input with mixed images
-        parsed_input = parse_input(
+        parsed_input = await parse_input(
             user_id=test_user_id,
             group_id="987654321",
             message="Mika, 看看这些图片",
@@ -298,7 +298,7 @@ class TestImageProcessingFlow:
         disable_deduplication_for_test()
         
         # Step 1: Parse input
-        parsed_input = parse_input(
+        parsed_input = await parse_input(
             user_id=test_user_id,
             group_id="987654321",
             message="Mika, 看看这张图片",
@@ -352,7 +352,7 @@ class TestImageProcessingFlow:
         disable_deduplication_for_test()
         
         # Step 1: Parse input
-        parsed_input = parse_input(
+        parsed_input = await parse_input(
             user_id=test_user_id,
             group_id="987654321",
             message="Mika, 看看这张图片",

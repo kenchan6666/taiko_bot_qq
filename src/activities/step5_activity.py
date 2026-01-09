@@ -9,6 +9,7 @@ Per T046: Create src/activities/step5_activity.py wrapping step5.py as Temporal 
 
 from temporalio import activity
 
+from src.services.database import ensure_database_initialized
 from src.steps.step5 import update_impression
 
 
@@ -50,6 +51,9 @@ async def step5_update_impression_activity(
         ... )
         >>> print(result["interaction_count"])
     """
+    # Ensure database is initialized (required for Worker processes)
+    await ensure_database_initialized()
+
     # Reconstruct ParsedInput from dict
     from src.steps.step1 import ParsedInput
 
@@ -90,14 +94,21 @@ async def step5_update_impression_activity(
 
     recent_conversations = []
     for conv_data in context_dict.get("recent_conversations", []):
-        conv = Conversation(
+        # Reconstruct Conversation with all required fields
+        conv_timestamp = None
+        if conv_data.get("timestamp"):
+            conv_timestamp = datetime.fromisoformat(conv_data["timestamp"])
+        else:
+            conv_timestamp = datetime.utcnow()
+        
+        # Use Conversation.create() to ensure expires_at is set correctly
+        conv = Conversation.create(
             user_id=conv_data["user_id"],
             group_id=conv_data["group_id"],
             message=conv_data["message"],
             response=conv_data["response"],
+            timestamp=conv_timestamp,
         )
-        if conv_data.get("timestamp"):
-            conv.timestamp = datetime.fromisoformat(conv_data["timestamp"])
         recent_conversations.append(conv)
 
     context = UserContext(
@@ -137,6 +148,8 @@ async def step5_update_impression_activity(
             "group_id": conversation.group_id,
             "message": conversation.message,
             "response": conversation.response,
+            "timestamp": conversation.timestamp.isoformat() if conversation.timestamp else None,
+            "expires_at": conversation.expires_at.isoformat() if conversation.expires_at else None,
             "timestamp": conversation.timestamp.isoformat() if conversation.timestamp else None,
         },
         "interaction_count": impression.interaction_count,

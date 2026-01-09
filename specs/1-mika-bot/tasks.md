@@ -248,7 +248,7 @@
 
 ### Intent Classification System
 
-- [ ] T065A [US1] Enhance src/services/intent_detection.py with fine-grained intent classification:
+- [x] T065A [US1] Enhance src/services/intent_detection.py with fine-grained intent classification:
   - Conversational intents: greeting, help, goodbye, preference_confirmation, clarification_request
   - Song-related intents: song_query, song_recommendation, difficulty_advice, bpm_analysis
   - Game-related intents: game_tips, achievement_celebration, practice_advice
@@ -257,21 +257,21 @@
 
 ### Intent-Specific Prompt Templates
 
-- [ ] T065B [US1] Add intent-specific prompt templates to src/prompts.py using PromptManager API:
+- [x] T065B [US1] Add intent-specific prompt templates to src/prompts.py using PromptManager API:
   - Conversational intents: greeting, help, goodbye prompts
   - Song-related intents: song_recommendation, difficulty_advice, bpm_analysis prompts
   - Game-related intents: game_tips, achievement_celebration, practice_advice prompts (Effort: 2h)
 
 ### Scenario-Based Prompt Templates
 
-- [ ] T065C [US1] Add scenario-based prompt templates to src/prompts.py for specific contexts:
+- [x] T065C [US1] Add scenario-based prompt templates to src/prompts.py for specific contexts:
   - song_recommendation_high_bpm, song_recommendation_beginner_friendly
   - difficulty_advice_beginner, difficulty_advice_expert
   - game_tips_timing, game_tips_accuracy (Effort: 2h)
 
 ### Intent-Based Prompt Selection
 
-- [ ] T065D [US1] Update src/steps/step4.py to use intent-based prompt selection:
+- [x] T065D [US1] Update src/steps/step4.py to use intent-based prompt selection:
   - Detect intent from parsed_input and context using intent_detection service
   - Select appropriate prompt template based on intent and scenario
   - Fallback to use_case-based prompts if intent not detected (infer use_case from message content)
@@ -279,12 +279,12 @@
 
 ### Intent Detection Integration
 
-- [ ] T065E [US1] Update src/steps/step1.py to integrate intent detection service and pass detected intent to subsequent steps (Effort: 2h)
+- [x] T065E [US1] Update src/steps/step1.py to integrate intent detection service and pass detected intent to subsequent steps (Effort: 2h)
 
 ### Testing
 
-- [ ] T065F [P] [US1] Create tests/unit/test_intent_detection.py with intent classification tests (rule-based and LLM-based) and fallback to use_case-based prompts when intent detection fails (Effort: 2h)
-- [ ] T065G [US1] Create tests/integration/test_intent_prompt_selection.py with end-to-end intent-based prompt selection tests, including fallback scenarios and logging verification (Effort: 2h)
+- [x] T065F [P] [US1] Create tests/unit/test_intent_detection.py with intent classification tests (rule-based and LLM-based) and fallback to use_case-based prompts when intent detection fails (Effort: 2h)
+- [x] T065G [US1] Create tests/integration/test_intent_prompt_selection.py with end-to-end intent-based prompt selection tests, including fallback scenarios and logging verification (Effort: 2h)
 
 **Checkpoint**: Intent classification system operational, contextually appropriate responses based on detected intents and scenarios
 
@@ -296,13 +296,13 @@
 
 **Effort Estimate**: 8-10 hours
 
-- [ ] T066 [P] Create LangBot configuration file with keyword trigger pattern (?i)(mika|米卡|mika酱) (Effort: 2h)
-- [ ] T067 [P] Configure group whitelist in LangBot (LANGBOT_ALLOWED_GROUPS environment variable) (Effort: 1h)
-- [ ] T068 Update src/api/routes/langbot.py to validate group_id against whitelist (Effort: 2h)
-- [ ] T069 [P] Document webhook endpoint exposure methods in quickstart.md: ngrok for local development, Nginx/public IP for production (Effort: 1h)
-- [ ] T070 [P] Create setup guide for exposing webhook endpoint (local: ngrok setup instructions, production: Nginx configuration) (Effort: 1.5h)
-- [ ] T071 Configure LangBot to send webhooks to FastAPI backend endpoint (/webhook/langbot) - use ngrok URL for local development or public domain/IP for production (Effort: 1h)
-- [ ] T072 Test LangBot integration with QQ groups (verify webhook delivery, test keyword triggers, validate group whitelist) (Effort: 2.5h)
+- [x] T066 [P] Create LangBot configuration file with keyword trigger pattern (?i)(mika|米卡|mika酱) (Effort: 2h)
+- [x] T067 [P] Configure group whitelist in LangBot (LANGBOT_ALLOWED_GROUPS environment variable) (Effort: 1h)
+- [x] T068 Update src/api/routes/langbot.py to validate group_id against whitelist (Effort: 2h)
+- [x] T069 [P] Document webhook endpoint exposure methods in quickstart.md: ngrok for local development, Nginx/public IP for production (Effort: 1h)
+- [x] T070 [P] Create setup guide for exposing webhook endpoint (local: ngrok setup instructions, production: Nginx configuration) (Effort: 1.5h)
+- [x] T071 Configure LangBot to send webhooks to FastAPI backend endpoint (/webhook/langbot) - use ngrok URL for local development or public domain/IP for production (Effort: 1h)
+- [x] T072 Test LangBot integration with QQ groups (verify webhook delivery, test keyword triggers, validate group whitelist) (Effort: 2.5h)
 
 **Checkpoint**: LangBot configured and responding in QQ groups via webhook connection (local development with ngrok or production with public endpoint)
 
@@ -314,13 +314,13 @@
 
 **Effort Estimate**: 8-10 hours
 
-- [ ] T073 [P] Create docker/Dockerfile.backend for FastAPI application (Effort: 2h)
-- [ ] T074 [P] Create docker/Dockerfile.temporal for Temporal worker (Effort: 1h)
-- [ ] T075 Create docker-compose.yml with services: backend, mongo, temporal, temporal-postgresql, nginx (optional). Note: LangBot and Napcat are external services deployed separately (Effort: 3h)
-- [ ] T076 Create .dockerignore file (Effort: 0.5h)
-- [ ] T077 Update quickstart.md with Docker Compose deployment instructions and external service setup (LangBot, Napcat) (Effort: 1h)
-- [ ] T078 [P] Document external service deployment requirements (LangBot and Napcat must be deployed separately, webhook endpoint configuration) (Effort: 1h)
-- [ ] T079 Test full stack deployment locally (verify all services start, test webhook endpoint accessibility) (Effort: 2.5h)
+- [x] T073 [P] Create docker/Dockerfile.backend for FastAPI application (Effort: 2h)
+- [x] T074 [P] Create docker/Dockerfile.temporal for Temporal worker (Effort: 1h)
+- [x] T075 Create docker-compose.yml with services: backend, mongo, temporal, temporal-postgresql, nginx (optional). Note: LangBot and Napcat are external services deployed separately (Effort: 3h)
+- [x] T076 Create .dockerignore file (Effort: 0.5h)
+- [x] T077 Update quickstart.md with Docker Compose deployment instructions and external service setup (LangBot, Napcat) (Effort: 1h)
+- [x] T078 [P] Document external service deployment requirements (LangBot and Napcat must be deployed separately, webhook endpoint configuration) (Effort: 1h)
+- [x] T079 Test full stack deployment locally (verify all services start, test webhook endpoint accessibility) (Effort: 2.5h)
 
 **Checkpoint**: Full stack deployable via Docker Compose
 
@@ -334,29 +334,29 @@
 
 ### Cleanup Job
 
-- [ ] T080 Create scripts/cleanup_old_conversations.py for 90-day conversation deletion (Effort: 2h)
-- [ ] T081 Configure cleanup job as Temporal scheduled workflow or cron job (Effort: 1h)
+- [x] T080 Create scripts/cleanup_old_conversations.py for 90-day conversation deletion (Effort: 2h)
+- [x] T081 Configure cleanup job as Temporal scheduled workflow or cron job (Effort: 1h)
 
 ### Language Detection Enhancement
 
-- [ ] T082 Update src/steps/step1.py with automatic language detection using langdetect (Effort: 1h)
-- [ ] T083 Update src/steps/step4.py to use detected/preferred language in LLM prompt via PromptManager (Effort: 1h)
+- [x] T082 Update src/steps/step1.py with automatic language detection using langdetect (Effort: 1h) - ✅ 已实现
+- [x] T083 Update src/steps/step4.py to use detected/preferred language in LLM prompt via PromptManager (Effort: 1h) - ✅ 已实现
 
 ### Prompt Engineering & Template System Enhancement
 
-- [ ] T087 [P] Enhance PromptManager in src/prompts.py with prompt versioning support (version tags, version history) (Effort: 2h)
-- [ ] T088 [P] Add A/B testing capabilities to PromptManager (traffic splitting, experiment tracking) (Effort: 2h)
-- [ ] T089 Add cultural sensitivity guidelines to prompt templates in src/prompts.py (Effort: 1h)
+- [x] T087 [P] Enhance PromptManager in src/prompts.py with prompt versioning support (version tags, version history) (Effort: 2h)
+- [x] T088 [P] Add A/B testing capabilities to PromptManager (traffic splitting, experiment tracking) (Effort: 2h)
+- [x] T089 Add cultural sensitivity guidelines to prompt templates in src/prompts.py (Effort: 1h)
 
 ### Error Handling & Graceful Degradation
 
-- [ ] T090 Implement fallback mechanisms in step3.py: use local JSON file (data/database.json) when taikowiki API unavailable, notify user (e.g., "使用缓存数据，可能不是最新的" / "Using cached data, may not be latest") (Effort: 2h)
-- [ ] T091 Implement fallback mechanisms in step4.py: use cached data or default themed responses when LLM fails, notify user in response. System may support local LLM models in the future as alternative to OpenRouter API (Effort: 2h)
+- [x] T090 Implement fallback mechanisms in step3.py: use local JSON file (data/database.json) when taikowiki API unavailable, notify user (e.g., "使用缓存数据，可能不是最新的" / "Using cached data, may not be latest") (Effort: 2h) - ✅ 已实现
+- [x] T091 Implement fallback mechanisms in step4.py: use cached data or default themed responses when LLM fails, notify user in response. System may support local LLM models in the future as alternative to OpenRouter API (Effort: 2h) - ✅ 已实现
 
 ### Monitoring & Health Checks
 
-- [ ] T092 Create src/api/routes/health.py with /health endpoint (MongoDB, Temporal, OpenRouter status) per NFR-011 (Effort: 2h)
-- [ ] T093 Create src/api/routes/metrics.py with /metrics endpoint (Prometheus format: request rate, error rate, response time p50/p95/p99, system resources) per NFR-011 (Effort: 2h)
+- [x] T092 Create src/api/routes/health.py with /health endpoint (MongoDB, Temporal, OpenRouter status) per NFR-011 (Effort: 2h)
+- [x] T093 Create src/api/routes/metrics.py with /metrics endpoint (Prometheus format: request rate, error rate, response time p50/p95/p99, system resources) per NFR-011 (Effort: 2h)
 
 **Checkpoint**: Advanced features complete, system production-ready
 
@@ -370,25 +370,25 @@
 
 ### Edge Case Tests
 
-- [ ] T094 [P] Create tests/unit/test_edge_cases.py: no name trigger, network failure, LLM timeout, malformed input (Effort: 4h)
-- [ ] T095 [P] Create tests/unit/test_content_filter.py: hatred, politics, religion filtering edge cases (Effort: 3h)
-- [ ] T096 [P] Create tests/unit/test_rate_limiter.py: rate limit enforcement, sliding window accuracy (Effort: 2h)
+- [x] T094 [P] Create tests/unit/test_edge_cases.py: no name trigger, network failure, LLM timeout, malformed input (Effort: 4h)
+- [x] T095 [P] Create tests/unit/test_content_filter.py: hatred, politics, religion filtering edge cases (Effort: 3h)
+- [x] T096 [P] Create tests/unit/test_rate_limiter.py: rate limit enforcement, sliding window accuracy (Effort: 2h)
 
 ### Integration Tests
 
-- [ ] T097 Create tests/integration/test_multi_group.py: concurrent requests from multiple groups (Effort: 3h)
-- [ ] T098 Create tests/integration/test_error_scenarios.py: service failures, graceful degradation (Effort: 3h)
-- [ ] T099 Create tests/integration/test_privacy.py: hashed user IDs, 90-day deletion, cross-group recognition (Effort: 3h)
+- [x] T097 Create tests/integration/test_multi_group.py: concurrent requests from multiple groups (Effort: 3h)
+- [x] T098 Create tests/integration/test_error_scenarios.py: service failures, graceful degradation (Effort: 3h)
+- [x] T099 Create tests/integration/test_privacy.py: hashed user IDs, 90-day deletion, cross-group recognition (Effort: 3h)
 
 ### Load Testing
 
-- [ ] T100 Create tests/load/test_concurrent_requests.py: 100 concurrent requests test (Effort: 3h)
-- [ ] T101 Create tests/load/test_response_time.py: < 3s response time validation (Effort: 2h)
+- [x] T100 Create tests/load/test_concurrent_requests.py: 100 concurrent requests test (Effort: 3h)
+- [x] T101 Create tests/load/test_response_time.py: < 3s response time validation (Effort: 2h)
 
 ### Manual Testing Scripts (NFR-012)
 
-- [ ] T102 [P] Create scripts/test_webhook.py for manual testing of LangBot webhook endpoint (accepts command-line arguments for message, group_id, user_id, optional image) (Effort: 2h)
-- [ ] T103 [P] Create scripts/test_song_query.py for manual testing of song queries (accepts command-line arguments for song name, tests fuzzy matching and caching) (Effort: 2h)
+- [x] T102 [P] Create scripts/test_webhook.py for manual testing of LangBot webhook endpoint (accepts command-line arguments for message, group_id, user_id, optional image) (Effort: 2h)
+- [x] T103 [P] Create scripts/test_song_query.py for manual testing of song queries (accepts command-line arguments for song name, tests fuzzy matching and caching) (Effort: 2h)
 
 **Checkpoint**: Comprehensive test coverage achieved (80%+ target), manual testing scripts available for rapid iteration
 

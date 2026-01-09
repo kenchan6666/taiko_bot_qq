@@ -36,9 +36,10 @@ class TestStep1Activity:
         assert result["message"] == "Mika, hello!"
         assert result["language"] in ["zh", "en"]
 
-    def test_parse_input_no_mika_mention(self) -> None:
+    @pytest.mark.asyncio
+    async def test_parse_input_no_mika_mention(self) -> None:
         """Test parsing message without 'Mika' mention returns None."""
-        result = step1_parse_input_activity(
+        result = await step1_parse_input_activity(
             user_id="123456789",
             group_id="987654321",
             message="Hello, world!",

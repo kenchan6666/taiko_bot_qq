@@ -68,3 +68,4 @@ logs/
 # Project specific
 *.db
 *.sqlite
+.jobs.json

@@ -30,6 +30,8 @@ async def step4_invoke_llm_activity(
 
     Args:
         parsed_input_dict: Dictionary representation of ParsedInput from step1.
+            Must include: hashed_user_id, group_id, message, language, images (optional),
+            intent (optional), scenario (optional).
         context_dict: Dictionary representation of UserContext from step2.
         song_info: Optional song information dictionary from step3.
 
@@ -37,7 +39,13 @@ async def step4_invoke_llm_activity(
         Generated response text from LLM.
 
     Example:
-        >>> parsed = {"hashed_user_id": "...", "message": "Hello!", ...}
+        >>> parsed = {
+        ...     "hashed_user_id": "...",
+        ...     "message": "Hello!",
+        ...     "intent": "greeting",
+        ...     "scenario": None,
+        ...     ...
+        ... }
         >>> context = {"is_new_user": True, ...}
         >>> response = await step4_invoke_llm_activity(parsed, context)
         >>> print(response)
@@ -52,6 +60,8 @@ async def step4_invoke_llm_activity(
         message=parsed_input_dict["message"],
         language=parsed_input_dict["language"],
         images=parsed_input_dict.get("images") or [],
+        intent=parsed_input_dict.get("intent"),  # Include detected intent
+        scenario=parsed_input_dict.get("scenario"),  # Include detected scenario
     )
 
     # Reconstruct UserContext from dict
@@ -83,14 +93,21 @@ async def step4_invoke_llm_activity(
 
     recent_conversations = []
     for conv_data in context_dict.get("recent_conversations", []):
-        conv = Conversation(
+        # Reconstruct Conversation with all required fields
+        # Use Conversation.create() to ensure expires_at is set correctly
+        conv_timestamp = None
+        if conv_data.get("timestamp"):
+            conv_timestamp = datetime.fromisoformat(conv_data["timestamp"])
+        else:
+            conv_timestamp = datetime.utcnow()
+        
+        conv = Conversation.create(
             user_id=conv_data["user_id"],
             group_id=conv_data["group_id"],
             message=conv_data["message"],
             response=conv_data["response"],
+            timestamp=conv_timestamp,
         )
-        if conv_data.get("timestamp"):
-            conv.timestamp = datetime.fromisoformat(conv_data["timestamp"])
         recent_conversations.append(conv)
 
     context = UserContext(

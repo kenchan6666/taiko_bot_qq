@@ -1,0 +1,50 @@
+# Dockerfile for Temporal Worker
+# 
+# Per T074: Create docker/Dockerfile.temporal for Temporal worker
+# 
+# This Dockerfile builds a production-ready image for the Temporal worker
+# that processes workflows and activities with retry logic and fault tolerance.
+
+FROM python:3.12-slim as base
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Poetry
+ENV POETRY_VERSION=1.6.1
+ENV POETRY_HOME=/opt/poetry
+ENV POETRY_CACHE_DIR=/opt/poetry-cache
+RUN pip install --no-cache-dir poetry==${POETRY_VERSION} && \
+    poetry --version
+
+# Configure Poetry: Don't create virtual environment, install to system
+ENV POETRY_VENV_IN_PROJECT=1
+ENV POETRY_NO_INTERACTION=1
+ENV POETRY_INSTALLER_MAX_WORKERS=10
+
+# Copy dependency files
+COPY pyproject.toml poetry.lock* ./
+
+# Install dependencies (production only, no dev dependencies)
+RUN poetry install --only=main --no-root && \
+    rm -rf ${POETRY_CACHE_DIR}
+
+# Copy application code
+COPY src/ ./src/
+COPY data/ ./data/  # Song database fallback file
+
+# Set Python path
+ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
+
+# Health check (check if worker process is running)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD pgrep -f "temporal_worker.py" || exit 1
+
+# Run Temporal worker
+CMD ["poetry", "run", "python", "src/workers/temporal_worker.py"]

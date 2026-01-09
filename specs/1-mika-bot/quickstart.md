@@ -112,11 +112,16 @@ In a separate terminal:
 poetry run python src/workers/temporal_worker.py
 ```
 
-### 8. Expose Webhook for LangBot (Local Development)
+### 8. Expose Webhook for LangBot
+
+**Important**: LangBot needs to access your FastAPI backend's `/webhook/langbot` endpoint. The method depends on your deployment environment.
+
+#### Option A: Local Development (Using ngrok)
 
 If you're running LangBot separately and need to connect it to your local FastAPI backend, use ngrok to expose the webhook endpoint:
 
 ```bash
+# Install ngrok: https://ngrok.com/download
 # In a new terminal, start ngrok tunnel
 ngrok http 8000
 
@@ -124,7 +129,29 @@ ngrok http 8000
 # Use this URL in LangBot configuration: https://abc123.ngrok.io/webhook/langbot
 ```
 
-**Note**: For production deployment, use a public domain or IP address instead of ngrok.
+**Alternative tunneling services**:
+- Cloudflare Tunnel: `cloudflared tunnel --url http://localhost:8000`
+- localtunnel: `lt --port 8000`
+- serveo: `ssh -R 80:localhost:8000 serveo.net`
+
+#### Option B: Production Deployment (Public IP/Domain + Nginx)
+
+For production, use a public domain or IP address with Nginx reverse proxy:
+
+1. **Configure Nginx** (see [WEBHOOK_SETUP_GUIDE.md](../../WEBHOOK_SETUP_GUIDE.md) for detailed instructions):
+   - Set up reverse proxy to `http://localhost:8000`
+   - Configure SSL certificate (Let's Encrypt recommended)
+   - Use domain like `https://api.yourdomain.com/webhook/langbot`
+
+2. **Configure LangBot**:
+   ```yaml
+   triggers:
+     - type: keyword
+       pattern: "(?i)(mika|米卡|mika酱)"
+       webhook_url: "https://api.yourdomain.com/webhook/langbot"
+   ```
+
+**For detailed webhook setup instructions**, see [WEBHOOK_SETUP_GUIDE.md](../../WEBHOOK_SETUP_GUIDE.md).
 
 ### 9. Test the API
 
@@ -172,138 +199,82 @@ The `docker-compose.yml` file includes all required services that MUST run conti
 
 **Required Services** (must run continuously, deployed in this project):
 - **backend**: FastAPI backend + Temporal client (handles webhooks, calls gpt-4o, executes 5-step chain)
-- **temporal-worker**: Temporal worker to process workflows
+- **temporal-worker**: Temporal worker to process workflows and activities
 - **temporal**: Temporal server (workflow engine must be online to schedule tasks and retries)
-- **temporal-postgresql**: PostgreSQL database for Temporal (workflow state storage)
-- **mongo**: MongoDB (must store user history and impressions; downtime causes memory loss)
+- **postgresql**: PostgreSQL database for Temporal (workflow state storage)
+- **mongodb**: MongoDB (must store user history and impressions; downtime causes memory loss)
 
 **Recommended Service**:
-- **nginx**: Reverse proxy with HTTPS and load balancing (strongly recommended for stable public network entry point)
+- **nginx**: Reverse proxy with HTTPS and load balancing (strongly recommended for stable public network entry point). See docker-compose.yml for commented nginx configuration.
 
 **External Services** (must run continuously, deployed separately):
 - **LangBot**: Core bot platform (must receive QQ messages and manage triggers). Deployed separately, connects to FastAPI backend via webhook at `/webhook/langbot`
 - **Napcat**: QQ protocol layer (must keep bot account online; downtime prevents message reception). Deployed separately or as part of LangBot deployment
 
-```yaml
-services:
-  backend:
-    build: ./docker/Dockerfile.backend
-    ports:
-      - "8000:8000"
-    environment:
-      - MONGODB_URL=mongodb://mongo:27017
-      - TEMPORAL_HOST=temporal
-    depends_on:
-      - mongo
-      - temporal
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    restart: unless-stopped
+**For detailed external service deployment instructions**, see [EXTERNAL_SERVICES_DEPLOYMENT.md](../../EXTERNAL_SERVICES_DEPLOYMENT.md).
 
-  temporal-worker:
-    build: ./docker/Dockerfile.temporal
-    depends_on:
-      - temporal
-      - mongo
-    environment:
-      - TEMPORAL_HOST=temporal:7233
-      - MONGODB_URL=mongodb://mongo:27017
-    restart: unless-stopped
+The `docker-compose.yml` file in the project root includes all services. Key services:
 
-  temporal:
-    image: temporalio/auto-setup:latest
-    ports:
-      - "7233:7233"
-    depends_on:
-      - temporal-postgresql
-    healthcheck:
-      test: ["CMD", "tctl", "cluster", "health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    restart: unless-stopped
+- **backend**: FastAPI backend (builds from `docker/Dockerfile.backend`)
+- **temporal-worker**: Temporal worker (builds from `docker/Dockerfile.temporal`)
+- **temporal**: Temporal server (uses `temporalio/auto-setup` image)
+- **postgresql**: PostgreSQL for Temporal state storage
+- **mongodb**: MongoDB for application data
 
-  temporal-postgresql:
-    image: postgres:15
-    environment:
-      - POSTGRES_DB=temporal
-      - POSTGRES_USER=temporal
-      - POSTGRES_PASSWORD=temporal
-    volumes:
-      - temporal_postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U temporal"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-
-  mongo:
-    image: mongo:7.0
-    volumes:
-      - mongo_data:/data/db
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-
-  nginx:
-    # LangBot service configuration
-    # Must run continuously to receive QQ messages
-    restart: unless-stopped
-    # ...
-
-  napcat:
-    # Napcat service configuration
-    # Must run continuously to keep bot account online
-    restart: unless-stopped
-    # ...
-
-  nginx:
-    image: nginx:alpine
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./nginx/ssl:/etc/nginx/ssl
-    depends_on:
-      - backend
-    restart: unless-stopped
-
-volumes:
-  mongo_data:
-  temporal_postgres_data:
-```
+**Note**: See the actual `docker-compose.yml` file for complete configuration. Nginx configuration is commented out but can be enabled for production.
 
 ### Deploy
 
+**Prerequisites**:
+1. Ensure you have a `.env` file with required environment variables (see Environment Configuration section above)
+2. Ensure `OPENROUTER_API_KEY` is set (required for LLM functionality)
+3. Optionally set `LANGBOT_API_KEY` if using LangBot API for message sending
+
+**Deploy Steps**:
+
 ```bash
-# Build and start all services
+# 1. Build and start all services
 docker-compose up -d
 
-# View logs
-docker-compose logs -f backend
+# 2. Check service status
+docker-compose ps
 
-# Stop all services
+# 3. View logs (all services)
+docker-compose logs -f
+
+# 4. View logs for specific service
+docker-compose logs -f backend
+docker-compose logs -f temporal-worker
+
+# 5. Check health status
+docker-compose ps  # Check health status in STATUS column
+curl http://localhost:8000/health  # Test backend health endpoint
+
+# 6. Stop all services
 docker-compose down
 
-# Stop and remove volumes
+# 7. Stop and remove volumes (WARNING: This deletes all data)
 docker-compose down -v
 ```
+
+**Service Health Checks**:
+- Backend: `curl http://localhost:8000/health`
+- Temporal Web UI: `http://localhost:8088` (open in browser)
+- MongoDB: `docker-compose exec mongodb mongosh --eval "db.adminCommand('ping')"`
+- PostgreSQL: `docker-compose exec postgresql pg_isready -U temporal`
 
 ### External Services Setup
 
 **Important**: LangBot and Napcat are external services that must be deployed separately. They are not included in this project's Docker Compose stack.
 
-1. **Deploy LangBot** (follow LangBot official documentation):
-   - Install and configure LangBot separately
+**For complete external service deployment instructions**, see [EXTERNAL_SERVICES_DEPLOYMENT.md](../../EXTERNAL_SERVICES_DEPLOYMENT.md).
+
+**Quick Setup Summary**:
+
+1. **Deploy LangBot**:
+   - Install and configure LangBot separately (see [LANGBOT_CONFIGURATION.md](../../LANGBOT_CONFIGURATION.md))
    - Configure LangBot to send webhooks to your FastAPI backend: `http://your-backend-url:8000/webhook/langbot`
+   - Configure keyword trigger: `(?i)(mika|米卡|mika酱)`
    - Ensure LangBot is running continuously
 
 2. **Deploy Napcat** (if not included in LangBot deployment):
@@ -316,7 +287,8 @@ docker-compose down -v
    - **For production**: Ensure FastAPI backend is accessible from the internet (check firewall rules, Nginx configuration)
    - Test webhook endpoint: `curl -X POST http://your-backend-url:8000/webhook/langbot` (or `https://` if using HTTPS)
    - Check LangBot logs to confirm successful webhook delivery
-   - Check FastAPI backend logs to confirm webhook requests are being received
+   - Check FastAPI backend logs: `docker-compose logs -f backend`
+   - Test end-to-end: Send "Mika, 你好！" in QQ group and verify response
 
 ## LangBot Configuration (External Service)
 
@@ -342,21 +314,26 @@ If your FastAPI backend is running locally (localhost), you need to expose it to
 ngrok http 8000
 
 # You'll get a public URL like: https://abc123.ngrok.io
-# Use this URL in LangBot configuration
+# Use this URL in LangBot configuration: https://abc123.ngrok.io/webhook/langbot
 ```
 
 **Using other tunneling services**:
-- Cloudflare Tunnel (`cloudflared`)
-- localtunnel (`npx localtunnel --port 8000`)
-- serveo (`ssh -R 80:localhost:8000 serveo.net`)
+- Cloudflare Tunnel: `cloudflared tunnel --url http://localhost:8000`
+- localtunnel: `lt --port 8000`
+- serveo: `ssh -R 80:localhost:8000 serveo.net`
 
-#### Option B: Production Deployment (Public IP/Domain)
+#### Option B: Production Deployment (Public IP/Domain + Nginx)
 
 If your FastAPI backend is deployed on a server with a public IP or domain:
 
-- **With Nginx reverse proxy**: Use your domain with HTTPS (e.g., `https://api.yourdomain.com/webhook/langbot`)
-- **Direct access**: Use your server's public IP (e.g., `http://your-server-ip:8000/webhook/langbot`)
+- **With Nginx reverse proxy** (recommended): Use your domain with HTTPS (e.g., `https://api.yourdomain.com/webhook/langbot`)
+  - See [WEBHOOK_SETUP_GUIDE.md](../../WEBHOOK_SETUP_GUIDE.md) for detailed Nginx configuration
+  - Configure SSL certificate using Let's Encrypt
+- **Direct access** (not recommended): Use your server's public IP (e.g., `http://your-server-ip:8000/webhook/langbot`)
+  - Security risk: No HTTPS, IP may change
 - **Cloud deployment**: Use your cloud provider's load balancer URL
+
+**For complete webhook setup instructions**, see [WEBHOOK_SETUP_GUIDE.md](../../WEBHOOK_SETUP_GUIDE.md).
 
 ### 3. Configure Keyword Trigger
 

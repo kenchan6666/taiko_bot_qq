@@ -55,8 +55,8 @@ async def step1_parse_input_activity(
         >>> if result:
         ...     print(result["hashed_user_id"])
     """
-    # Call step1.parse_input() function
-    parsed_input = parse_input(
+    # Call step1.parse_input() function (now async)
+    parsed_input = await parse_input(
         user_id=user_id,
         group_id=group_id,
         message=message,
@@ -73,4 +73,6 @@ async def step1_parse_input_activity(
         "message": parsed_input.message,
         "language": parsed_input.language,
         "images": parsed_input.images or [],
+        "intent": parsed_input.intent,  # Include detected intent
+        "scenario": parsed_input.scenario,  # Include detected scenario
     }

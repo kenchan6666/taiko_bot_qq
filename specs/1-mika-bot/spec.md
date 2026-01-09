@@ -33,6 +33,7 @@
 - Q: How should the system handle rapid consecutive messages from the same user (e.g., 3 messages within 1 second)? This affects message processing order, system load, and user experience. → A: System MUST process messages in order, but MUST skip duplicate or highly similar messages (deduplication). This ensures message order is preserved while avoiding redundant processing of duplicate content, improving efficiency and reducing costs. Similarity threshold and deduplication window (e.g., within 5 seconds) should be configurable
 - Q: How should the system handle unconfirmed preference requests when users do not respond for extended periods (e.g., 24+ hours)? This affects User Story 3 memory implementation and data persistence. → A: System MUST retain unconfirmed preferences in pending state but MUST NOT actively re-ask the same question. System MUST wait for users to mention related topics in future conversations, then re-confirm the preference naturally in context. This avoids annoying users with repeated questions while preserving the opportunity for natural confirmation when relevant
 - Q: What is the primary data source for song database and how should local JSON file (data/database.json) be used? This affects FR-002 implementation and data freshness. → A: taikowiki API is the PRIMARY data source. System MUST fetch from taikowiki API first and update local JSON file (data/database.json) periodically (e.g., hourly) for caching. Local JSON file is used ONLY as fallback when taikowiki API is unavailable. When updating local file, system SHOULD replace existing data to ensure consistency with API source. This ensures data freshness while providing resilience through local cache
+- Q: Should private messages (person-to-bot) require mentioning "Mika" to trigger a response, or should they respond to all messages? This affects user experience and message filtering behavior. → A: Private messages (person-to-bot) do NOT require mentioning "Mika" - the bot responds to all private messages (unless filtered by content). Group messages MUST require mentioning "Mika" (or variants like "米卡", "mika酱") to trigger a response. This provides a more natural one-on-one conversation experience in private chats while preventing spam in group chats
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -48,7 +49,7 @@ Users in QQ groups can interact with a themed chatbot named "Mika" that responds
 
 1. **Given** a user sends a message mentioning "Mika" in a QQ group, **When** the message contains a song query, **Then** the bot responds with relevant song information including difficulty and BPM details
 2. **Given** a user sends a message mentioning "Mika" in a QQ group, **When** the message is a general conversation, **Then** the bot responds with playful, themed content incorporating game elements like "Don!", "Katsu!", and emojis
-3. **Given** a user sends a message without mentioning "Mika", **When** the message is processed, **Then** the bot does not respond to prevent spam
+3. **Given** a user sends a message without mentioning "Mika" in a group chat, **When** the message is processed, **Then** the bot does not respond to prevent spam. **Note**: In private messages (person-to-bot), the bot responds to all messages without requiring "Mika" mention
 
 ---
 
@@ -102,6 +103,7 @@ Users can share images (such as Taiko no Tatsujin screenshots) with the bot and 
 ### Edge Cases
 
 - What happens when the bot is called by name in multiple groups simultaneously?
+- How does the bot handle private messages (person-to-bot) versus group messages? (Private messages do not require "Mika" mention; group messages require "Mika" mention per FR-001)
 - How does the system handle network failures when querying the song database?
 - What happens when the LLM service is unavailable or times out?
 - How does the bot handle messages with harmful or inappropriate content? (Content filtering blocks excessive hatred including ethnic hatred, political topics, and religious content per FR-007)
@@ -115,7 +117,7 @@ Users can share images (such as Taiko no Tatsujin screenshots) with the bot and 
 
 ### Functional Requirements
 
-- **FR-001**: System MUST only respond to messages that explicitly mention the bot's name ("Mika" or recognized variants like "mika", "米卡", "Mika酱")
+- **FR-001**: System MUST only respond to messages that explicitly mention the bot's name ("Mika" or recognized variants like "mika", "米卡", "Mika酱") in group messages. For private messages (person-to-bot), the system responds to all messages without requiring the bot's name mention, providing a more natural one-on-one conversation experience. This behavior difference prevents spam in group chats while enabling seamless private conversations
 - **FR-002**: System MUST provide accurate information about Taiko no Tatsujin songs when queried, including difficulty ratings and BPM. taikowiki API is the PRIMARY data source. System MUST fetch from taikowiki API first and update local JSON file (data/database.json) periodically (e.g., hourly) for caching. Local JSON file is used ONLY as fallback when taikowiki API is unavailable. System MUST implement in-memory caching with periodic refresh (e.g., hourly) for song data. Queries MUST prioritize cached data for fast response times, with automatic background refresh to maintain data freshness. When updating local file, system SHOULD replace existing data to ensure consistency with API source
 - **FR-003**: System MUST incorporate thematic game elements (e.g., "Don!", "Katsu!", emojis 🥁🎶) in all responses to maintain consistency
 - **FR-004**: System MUST support fuzzy matching for song name queries to handle partial or misspelled names. When fuzzy matching finds multiple potential matches, the system MUST return only the single best match (highest similarity score) and ask the user for confirmation in the response (e.g., "你是指《XXX》吗？" / "Did you mean 'XXX'?") before providing song details. The confirmation request MUST be included in a themed response with game elements per FR-003. This prevents information overload while ensuring accuracy

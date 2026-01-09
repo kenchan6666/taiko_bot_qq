@@ -21,6 +21,8 @@ from src.models.user import User
 
 # Global MongoDB client instance
 _client: Optional[AsyncIOMotorClient] = None
+# Track initialization state
+_initialized: bool = False
 
 
 async def init_database() -> None:
@@ -36,7 +38,11 @@ async def init_database() -> None:
     Raises:
         Exception: If MongoDB connection fails or initialization fails.
     """
-    global _client
+    global _client, _initialized
+
+    # Skip if already initialized (idempotent)
+    if _initialized:
+        return
 
     # Create MongoDB client
     # Motor (async MongoDB driver) is used by Beanie
@@ -62,6 +68,22 @@ async def init_database() -> None:
         ],
     )
 
+    _initialized = True
+
+
+async def ensure_database_initialized() -> None:
+    """
+    Ensure database is initialized (idempotent).
+
+    This function can be called multiple times safely.
+    It's useful for Activities that run in separate processes
+    (e.g., Temporal Worker) where database may not be initialized.
+
+    Raises:
+        Exception: If MongoDB connection fails or initialization fails.
+    """
+    await init_database()
+
 
 async def close_database() -> None:
     """
@@ -70,11 +92,12 @@ async def close_database() -> None:
     This function should be called at application shutdown
     to properly close the database connection.
     """
-    global _client
+    global _client, _initialized
 
     if _client:
         _client.close()
         _client = None
+        _initialized = False
 
 
 def get_database_client() -> Optional[AsyncIOMotorClient]:

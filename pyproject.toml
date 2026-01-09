@@ -20,6 +20,7 @@ pydantic = "^2.5.0"
 pydantic-settings = "^2.1.0"
 motor = "^3.3.0"  # MongoDB async driver for Beanie
 structlog = "^23.2.0"  # Structured JSON logging (NFR-010)
+psutil = "^5.9.0"  # System resource monitoring (NFR-011)
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"

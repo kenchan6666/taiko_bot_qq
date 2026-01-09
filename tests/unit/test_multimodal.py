@@ -187,11 +187,12 @@ class TestImageMimeTypeDetection:
 class TestParseInputWithImages:
     """Test parse_input function with image handling."""
 
+    @pytest.mark.asyncio
     @patch("src.steps.step1.check_content")
     @patch("src.steps.step1.get_deduplication_service")
     @patch("src.steps.step1.hash_user_id")
     @patch("src.steps.step1.detect_language")
-    def test_parse_input_with_valid_images(
+    async def test_parse_input_with_valid_images(
         self,
         mock_detect_language: MagicMock,
         mock_hash_user_id: MagicMock,
@@ -212,7 +213,7 @@ class TestParseInputWithImages:
         jpeg_base64 = base64.b64encode(jpeg_data).decode("utf-8")
 
         # Parse input with images
-        result = parse_input(
+        result = await parse_input(
             user_id="123456789",
             group_id="987654321",
             message="Mika, 看看这张图片",
@@ -226,11 +227,12 @@ class TestParseInputWithImages:
         assert len(result.images) == 1
         assert result.images[0] == jpeg_base64
 
+    @pytest.mark.asyncio
     @patch("src.steps.step1.check_content")
     @patch("src.steps.step1.get_deduplication_service")
     @patch("src.steps.step1.hash_user_id")
     @patch("src.steps.step1.detect_language")
-    def test_parse_input_with_invalid_images(
+    async def test_parse_input_with_invalid_images(
         self,
         mock_detect_language: MagicMock,
         mock_hash_user_id: MagicMock,
@@ -251,7 +253,7 @@ class TestParseInputWithImages:
         gif_base64 = base64.b64encode(gif_data).decode("utf-8")
 
         # Parse input with invalid images
-        result = parse_input(
+        result = await parse_input(
             user_id="123456789",
             group_id="987654321",
             message="Mika, 看看这张图片",

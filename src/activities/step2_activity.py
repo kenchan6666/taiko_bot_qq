@@ -11,6 +11,7 @@ from typing import Optional
 
 from temporalio import activity
 
+from src.services.database import ensure_database_initialized
 from src.steps.step2 import UserContext, retrieve_context
 
 
@@ -45,6 +46,9 @@ async def step2_retrieve_context_activity(hashed_user_id: str) -> dict:
         >>> print(context_dict["is_new_user"])
         >>> print(context_dict["relationship_status"])
     """
+    # Ensure database is initialized (required for Worker processes)
+    await ensure_database_initialized()
+
     # Call step2.retrieve_context() function
     context = await retrieve_context(hashed_user_id)
 
@@ -84,6 +88,7 @@ async def step2_retrieve_context_activity(hashed_user_id: str) -> dict:
                 "message": conv.message,
                 "response": conv.response,
                 "timestamp": conv.timestamp.isoformat() if conv.timestamp else None,
+                "expires_at": conv.expires_at.isoformat() if conv.expires_at else None,
             }
         )
 

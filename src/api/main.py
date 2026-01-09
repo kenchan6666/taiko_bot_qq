@@ -12,7 +12,9 @@ import sys
 from contextlib import asynccontextmanager
 
 import structlog
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 
 from src.config import settings
 from src.services.database import close_database, init_database
@@ -125,8 +127,51 @@ app = FastAPI(
 # Setup structured logging
 setup_structured_logging()
 
+# Add metrics middleware (must be before routes)
+from src.api.middleware.metrics import MetricsMiddleware  # noqa: E402
+app.add_middleware(MetricsMiddleware)
+
 # Import routes (must be after app creation)
 from src.api.routes import langbot  # noqa: E402
+from src.api.routes import health  # noqa: E402
+from src.api.routes import metrics  # noqa: E402
 
 # Register routes
 app.include_router(langbot.router, prefix="/webhook", tags=["webhooks"])
+app.include_router(health.router, prefix="/health", tags=["monitoring"])
+app.include_router(metrics.router, prefix="/metrics", tags=["monitoring"])
+
+
+# Add exception handler for validation errors to provide better error messages
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
+    """
+    Handle request validation errors with detailed logging.
+    
+    This helps debug 422 errors by logging the exact validation issues.
+    """
+    logger = structlog.get_logger()
+    
+    # Try to get request body for logging
+    body_preview = "N/A"
+    try:
+        body_bytes = await request.body()
+        body_preview = body_bytes.decode('utf-8', errors='ignore')[:500]
+    except Exception:
+        pass
+    
+    logger.error(
+        "request_validation_failed",
+        path=request.url.path,
+        method=request.method,
+        errors=exc.errors(),
+        body_preview=body_preview,
+    )
+    
+    return JSONResponse(
+        status_code=422,
+        content={
+            "detail": exc.errors(),
+            "body_preview": body_preview,
+        },
+    )
