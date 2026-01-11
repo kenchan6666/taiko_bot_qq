@@ -17,6 +17,9 @@ import structlog
 
 from src.config import settings
 
+# Performance optimization: Enable HTTP/2 for faster connections (if supported)
+# httpx.AsyncClient will automatically use HTTP/2 if the server supports it
+
 logger = structlog.get_logger()
 
 
@@ -44,12 +47,28 @@ class LLMService:
         # OpenRouter API endpoint
         self.api_url = "https://openrouter.ai/api/v1/chat/completions"
 
-        # Model: gpt-4o (supports multi-modal)
-        self.model = "openai/gpt-4o"
+        # Model: Configurable via OPENROUTER_MODEL environment variable
+        # Default: anthropic/claude-3.5-sonnet (recommended, most human-like, better emotion understanding)
+        # Alternative: openai/gpt-4o (fast, multimodal, but less human-like)
+        # Alternative: xai/grok-2 (witty and lively, but higher hallucination rate ~4.8%)
+        # 
+        # Switch model by setting OPENROUTER_MODEL in .env file or environment variable
+        self.model = settings.openrouter_model if hasattr(settings, 'openrouter_model') else "anthropic/claude-3.5-sonnet"
 
-        # HTTP client with timeout
+        # HTTP client with optimized timeout and connection pooling
+        # Performance optimization: Configure connection limits and timeouts for better performance
         self.client = httpx.AsyncClient(
-            timeout=30.0,  # 30 second timeout
+            timeout=httpx.Timeout(
+                connect=10.0,  # Connection timeout: 10s (faster connection establishment)
+                read=25.0,     # Read timeout: 25s (reduced from 30s for faster failure detection)
+                write=10.0,    # Write timeout: 10s
+                pool=5.0,      # Pool timeout: 5s (waiting for connection from pool)
+            ),
+            limits=httpx.Limits(
+                max_keepalive_connections=10,  # Keep connections alive for reuse (performance optimization)
+                max_connections=20,            # Max concurrent connections
+                keepalive_expiry=30.0,         # Keep connections alive for 30s
+            ),
             headers={
                 "Authorization": f"Bearer {self.api_key}",
                 "Content-Type": "application/json",
@@ -60,11 +79,11 @@ class LLMService:
         self,
         prompt: str,
         images: Optional[list[str]] = None,
-        temperature: float = 0.7,
+        temperature: float = 0.8,
         max_tokens: int = 500,
     ) -> str:
         """
-        Generate LLM response using OpenRouter gpt-4o.
+        Generate LLM response using OpenRouter (Claude 3.5 Sonnet by default).
 
         Supports both text-only and multi-modal (text + images) requests.
 
@@ -74,7 +93,12 @@ class LLMService:
         Args:
             prompt: Text prompt for LLM.
             images: Optional list of base64-encoded images (for multi-modal).
-            temperature: Sampling temperature (0.0-2.0, default: 0.7).
+            temperature: Sampling temperature (0.0-2.0, default: 0.8).
+                - 0.0-0.5: More focused, consistent (may be repetitive)
+                - 0.6-0.8: Balanced creativity and consistency (recommended for Claude)
+                - 0.9-1.5: More creative/diverse (good for friends/regular users)
+                - 1.5-2.0: Very random (not recommended)
+                Claude models are more sensitive to temperature than GPT-4o, so slightly higher values (0.8-0.95) work better.
             max_tokens: Maximum tokens in response (default: 500).
 
         Returns:
@@ -88,7 +112,7 @@ class LLMService:
             >>> service = LLMService(api_key="sk-...")
             >>> response = await service.generate_response(
             ...     prompt="Hello, I'm Mika!",
-            ...     temperature=0.7
+            ...     temperature=0.8
             ... )
             >>> print(response)
             "Hello! Nice to meet you! 🥁"

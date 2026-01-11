@@ -28,15 +28,23 @@ ENV POETRY_NO_INTERACTION=1
 ENV POETRY_INSTALLER_MAX_WORKERS=10
 
 # Copy dependency files
-COPY pyproject.toml poetry.lock* ./
+COPY pyproject.toml ./
+# Note: We regenerate poetry.lock in Docker to ensure consistency
+# If you need reproducible builds, ensure poetry.lock is committed and up-to-date
 
 # Install dependencies (production only, no dev dependencies)
-RUN poetry install --only=main --no-root && \
+# Regenerate lock file to match pyproject.toml, then install
+RUN poetry lock --no-update && \
+    poetry install --only=main --no-root --no-interaction && \
     rm -rf ${POETRY_CACHE_DIR}
 
 # Copy application code
 COPY src/ ./src/
-COPY data/ ./data/  # Song database fallback file
+
+# Copy data directory (Song database fallback file)
+# Create directory first to ensure it exists, then copy contents
+RUN mkdir -p ./data
+COPY data/ ./data/
 
 # Set Python path
 ENV PYTHONPATH=/app

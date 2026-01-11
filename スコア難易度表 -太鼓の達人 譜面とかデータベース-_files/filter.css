@@ -1,0 +1,159 @@
+.filter {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.filterlist {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  margin: 20px auto;
+  border: 0.5px solid black;
+  padding: 20px 30px;
+}
+
+.filterlist_title {
+  font-size: 19px;
+  font-family: "Zen Kaku Gothic Antique", sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  text-align: center;
+  border-bottom: 2px double gainsboro;
+}
+
+.filterlist_checkbox {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  text-align: center;
+  border-bottom: 0.5px dotted black;
+  margin-bottom: 10px;
+}
+
+.checkbox {
+  cursor: pointer;
+  margin: 0 9px;
+  vertical-align: middle;
+  font-family: "Zen Kaku Gothic Antique", sans-serif;
+  font-style: normal;
+}
+
+input[type="checkbox"] {
+  appearance: none;
+}
+
+@keyframes checkbox_animetion {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(180deg);
+  }
+}
+
+.checkbox_box {
+  display: inline-block;
+  position: relative;
+  vertical-align: middle;
+  background: url(/image/close.svg) no-repeat center center;
+  background-size: 100%;
+  animation: checkbox_animetion 0.5s ease-in-out forwards;
+  width: 18px;
+  height: 18px;
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+@keyframes checkbox_checked_animetion {
+  0% {
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1);
+  }
+  60% {
+    transform: scale(1) rotate(10deg);
+  }
+  70% {
+    transform: scale(1) rotate(0deg);
+  }
+  80% {
+    transform: scale(1) rotate(-10deg);
+  }
+  90% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.checkbox input[type="checkbox"]:checked + .checkbox_box {
+  background: url(/image/checkbox_checked.png) no-repeat center center;
+  background-size: 100%;
+  animation: checkbox_checked_animetion 1s ease-in-out forwards;
+}
+
+.filter_score_const {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+  align-items: center;
+}
+
+.filter_score_const input {
+  width: 75px;
+  height: 30px;
+  font-size: 22.5px;
+  padding: 7.5px;
+  border: 0.5px solid rgb(129, 129, 129);
+  border-radius: 0;
+  text-align: center;
+}
+
+.filter_score_const input::-webkit-outer-spin-button,
+.filter_score_const input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.filter_score_const input[type="number"] {
+	appearance: textfield; /* 標準のCSSプロパティ */
+	-moz-appearance: textfield; /* Firefox対応 */
+	-webkit-appearance: textfield; /* Safari対応 */
+}
+
+.filter_score_const span {
+  font-family: "Kosugi Maru", sans-serif;
+  font-size: 30px;
+  margin: 0 10px;
+}
+
+.filter_button {
+  width: 30px;
+  height: 30px;
+  border: 2px solid rgb(228, 237, 246);
+  background-color: rgb(236, 255, 251);
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Kosugi Maru", sans-serif;
+  font-size: 22.5px;
+  transition: 0.5s;
+}
+
+.filter_button:hover {
+  transition: 0.5s;
+  border: 2px solid rgb(228, 237, 246);
+  background-color: rgb(221, 245, 240);
+}
+
+.filter_button_minus:active {
+  transition: 0.1s;
+  color: rgb(56, 99, 255);
+}
+
+.filter_button_plus:active {
+  transition: 0.1s;
+  color: rgb(255, 58, 48);
+}

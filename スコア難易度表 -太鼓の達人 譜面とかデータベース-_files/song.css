@@ -1,0 +1,687 @@
+.wiki_link {
+   width: 60%;
+   min-width: 320px;
+   font-family: "Kosugi Maru", sans-serif;
+   text-decoration: none !important;
+   display: block;
+   text-align: center;
+   border: 2px solid black;
+   border-radius: 5px;
+   box-shadow: 0 5px 0 0 #7ecec2;
+   background-color: #9cfff0;
+   margin: 10px auto 20px auto;
+}
+
+.wiki_link:hover {
+   opacity: 0.75;
+}
+
+.wiki_link:active {
+   top: 5px;
+   box-shadow: none;
+}
+
+.wiki_link_title {
+   font-size: 40px;
+   font-family: "Kosugi Maru", sans-serif;
+   color: #005148;
+}
+
+.wiki_link_footnote {
+   font-size: 12px;
+   bottom: 5px;
+   color: #525252;
+}
+
+.song_title_wrapper {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   /*border-bottom: 4px double rgba(9, 67, 73, 0.285);*/
+   margin-bottom: 30px;
+   padding-bottom: 5px;
+}
+
+.song_title_area {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   flex-wrap: wrap;
+   border: 3px solid black;
+}
+
+.song_title {
+   text-align: center;
+   font-size: 32px;
+   font-family: "Kosugi Maru", sans-serif;
+   margin: 0 7.5px;
+   padding: 5px 10px;
+}
+
+.difficulty_title {
+   margin: 5px 7.5px 5px 7.5px;
+   font-size: 25px;
+   font-family: "Kosugi Maru", sans-serif;
+   border: 3px solid black;
+   line-height: 25px;
+   padding: 1px 8px;
+}
+
+.song_score_wrapper {
+   display: flex;
+   margin-bottom: 35px;
+}
+
+.user_image_song {
+   width: 36%;
+   height: 100%;
+   min-height: 300px;
+   background-color: #d3ffff;
+   border-radius: 5px;
+   padding: 12px;
+   display: flex;
+   flex-flow: column;
+   margin: auto 0;
+   text-align: center;
+}
+
+.donder_img_score {
+   width: 80%;
+   border-radius: 10px;
+   margin-bottom: 10px;
+   -webkit-user-drag: none;
+   -webkit-user-select: none;
+   -moz-user-select: none;
+   -ms-user-select: none;
+   user-select: none;
+   -user-drag: none;
+}
+
+.user_name_song {
+   background-color: rgba(87, 255, 213, 0.337);
+   font-size: 27.5px;
+   font-weight: bold;
+   font-family: "Kosugi Maru", sans-serif;
+}
+
+.user_name_song_link {
+	text-decoration: none;
+}
+
+.user_name_song:hover{
+   opacity: 0.7;
+	transition: 0.5s;
+}
+
+@media (max-width:1110px){
+	.user_name_song {
+      font-size: 20px;
+   }
+}
+
+.user_score_song {
+   width: 70%;
+   display: flex;
+   flex-flow: column;
+   justify-content: space-between;
+   margin-left: 20px;
+   background-color: rgba(255, 193, 49, 0.748);
+   border: 5px solid rgba(216, 167, 53, 0.748);
+   padding: 5px 20px;
+}
+
+.score_column_area {
+   display: flex;
+   justify-content: space-around;
+}
+
+.score_column {
+   display: flex;
+   flex-flow: column;
+}
+
+.score_accuracy {
+   width: 50%;
+}
+
+.score_total {
+   width: 50%;
+}
+
+.score_row {
+   display: flex;
+   align-items: center;
+}
+
+.score_row_image {
+   height: 50px;
+   margin: 10px 12px 0 12px;
+   object-fit: contain;
+}
+
+.score_row_images {
+   display: flex;
+   justify-content: center;
+   height: 60px;
+   width: 100%;
+   margin: 0 auto;
+}
+
+.rating_rank_image {
+   height: 30px;
+   object-fit: contain;
+}
+
+.score_row p {
+   width: 40%;
+   font-size: 37.5px;
+   font-family: "Kosugi Maru", sans-serif;
+   text-align: end;
+   white-space: nowrap;
+}
+
+.score_row_averoll {
+   font-family: "Kosugi Maru", sans-serif;
+   font-size: 25px !important;
+}
+
+.score_row_averoll span {
+   font-family: "Kosugi Maru", sans-serif;
+}
+
+.score_accuracy img {
+   width: 20%;
+   max-width: 130px;
+   min-width: 60px;
+   margin-right: 20px;
+}
+
+.score_total img {
+   width: 20%;
+   max-width: 130px;
+   min-width: 60px;
+   margin-right: 20px;
+}
+
+@media (max-width: 770px) {
+   .song_score_wrapper {
+      flex-flow: column;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: none;
+   }
+
+   .song_title {
+      font-size: 26px;
+   }
+
+   .user_image_song {
+      width: 90%;
+      margin-bottom: 20px;
+      min-height: 200px;
+   }
+
+   .user_name_song {
+      font-size: 20px;
+   }
+
+   .donder_img_score {
+      justify-content: center;
+      width: 40%;
+   }
+
+   .user_score_song {
+      /*flex-flow: column;*/
+      width: 95%;
+      margin-left: 0px;
+      padding: 10px 10px;
+   }
+
+   .score_accuracy {
+      width: 48%;
+      max-width: 160px;
+   }
+
+   .score_total {
+      width: 48%;
+      max-width: 220px;
+   }
+
+   .score_img_area {
+      width: 30px;
+   }
+
+   .score_accuracy img {
+      margin: 0 auto;
+   }
+
+   .score_total img {
+      margin: 0 auto;
+   }
+
+   .score_row p {
+      width: 70%;
+      font-size: 26px;
+   }
+
+   .score_row_averoll {
+      font-size: 22px;
+   }
+
+   .score_row_averoll span {
+      font-size: 14px;
+   }
+
+   .score_total img {
+      width: 10px;
+      min-width: 60px;
+      margin: 0 auto;
+   }
+
+   .score_row_images img {
+      min-width: 50px !important;
+   }
+
+	.wiki_link {
+		width: 80%;
+		min-width: 320px;
+	}
+
+	.wiki_link_title {
+		font-size: 24px;
+	}
+}
+
+@media (max-width: 460px) {
+   .song_title {
+      font-size: 22px;
+   }
+
+   .score_row p {
+      width: 70%;
+      font-size: 22px;
+   }
+
+   .score_row_averoll {
+      font-size: 18px !important;
+   }
+
+   .score_row_averoll span {
+      font-size: 10px !important;
+   }
+
+   .score_accuracy {
+      max-width: 120px;
+   }
+}
+
+.const_vote {
+   display: flex;
+   flex-flow: column;
+   align-items: center;
+   width: 70%;
+   margin: 0 auto;
+   background-color: rgba(234, 255, 234, 0.784);
+   border: 5px solid rgb(54, 149, 79);
+   border-radius: 5px;
+}
+
+.const_area {
+   display: flex;
+   flex-flow: column;
+   align-items: center;
+}
+
+.const_title {
+   font-size: 32px;
+   font-family: "Kosugi Maru", sans-serif;
+   padding: 5px 10px;
+   border: 2px solid rgb(2, 61, 57);
+   border-radius: 5px;
+   background-color: rgb(155, 255, 213);
+}
+
+.score_const_origin,
+.score_const_change {
+   font-size: 70px;
+   font-family: "Kosugi Maru", sans-serif;
+}
+
+.const_vote_form_wrapper {
+   display: flex;
+   flex-flow: column;
+   align-items: center;
+   margin: 10px auto 5px auto;
+}
+
+.const_vote_main {
+   display: flex;
+   flex-flow: column;
+   align-items: center;
+}
+
+.const_vote_form {
+   display: flex;
+   align-items: center;
+}
+
+.message_vote {
+   vertical-align: bottom;
+   font-size: 22px;
+   font-family: "Kosugi Maru", sans-serif;
+}
+
+.const_vote_form input {
+   width: 140px;
+   height: 50px;
+   font-size: 40px;
+   font-family: "DotGothic16", sans-serif;
+   padding: 7.5px;
+   border: 3px solid rgb(16, 93, 67);
+   border-radius: 5px;
+   text-align: center;
+}
+
+.const_vote_form input::-webkit-outer-spin-button,
+.const_vote_form input::-webkit-inner-spin-button {
+   -webkit-appearance: none;
+   margin: 0;
+}
+
+.const_comment {
+   width: 92%;
+   height: 150px;
+   padding: 5px 10px;
+   border: 3px solid rgb(16, 93, 67);
+   border-radius: 5px;
+   margin: 15px 0 5px 0;
+}
+
+.const_button {
+   width: 40px;
+   height: 40px;
+   border: 3px solid rgb(115, 169, 151);
+	box-shadow: 0 3px rgb(137, 188, 171);
+   border-radius: 30px;
+   background-color: rgb(94, 255, 209);
+   display: inline-flex;
+   justify-content: center;
+   align-items: center;
+   font-family: "Kosugi Maru", sans-serif;
+   font-size: 27.5px;
+   margin: 0 8px;
+}
+
+.const_button:hover {
+   background-color: rgba(94, 255, 209, 0.5);
+}
+
+.const_button:active {
+	transition: none;
+	top: 3px;
+	box-shadow: none;
+}
+
+.const_button_minus:hover {
+   color: rgb(56, 99, 255);
+}
+
+.const_button_plus:hover {
+   color: rgb(255, 58, 48);
+}
+
+.button_vote {
+   margin: 15px auto 5px auto;
+   padding: 7.5px 10px;
+   border: 2px solid rgb(123, 175, 157);
+   border-radius: 10px;
+   background-color: rgb(94, 255, 209);
+   font-size: 30px;
+   font-family: "Kosugi Maru", sans-serif;
+   box-shadow: 0 4px 0px rgb(123, 175, 157);
+}
+
+.button_vote:hover {
+   opacity: 0.6;
+   color: #525252;
+}
+
+.button_vote:active {
+   top: 4px;
+   box-shadow: none;
+}
+
+.button_vote_unvalid {
+   border: 2px solid rgb(150, 150, 150);
+   background-color: rgb(240, 240, 240);
+   box-shadow: 0 4px 0px rgb(150, 150, 150);
+}
+
+.message_vote_explain {
+   max-width: 320px;
+   font-size: 12px;
+   color: #525252;
+	text-align: center;
+}
+
+.message_vote_complete {
+   color: rgba(255, 125, 50, 0.815);
+   font-size: 17px;
+   font-family: "DotGothic16", sans-serif;
+}
+
+.message_vote_mismatch {
+   font-size: 20px;
+   font-family: "Kosugi Maru", sans-serif;
+   text-align: center;
+   color: #5a5a5a;
+   padding: 10px 0;
+}
+
+.message_vote_mismatch_crown {
+   bottom: 3px;
+   height: 20px;
+}
+
+@media (max-width: 770px) {
+
+   .score_const_origin,
+   .score_const_change {
+      font-size: 50px;
+      font-family: "DotGothic16", sans-serif;
+   }
+
+   .const_vote,
+   .song_info {
+      width: 98%;
+   }
+
+   .const_vote_form_wrapper {
+      flex-flow: column;
+      margin-top: 20px;
+   }
+
+   .message_vote {
+      font-size: 20px;
+   }
+}
+
+.song_info {
+   display: flex;
+   flex-flow: column;
+   align-items: center;
+   width: 80%;
+   margin: 0 auto 20px auto;
+   background-color: rgba(255, 254, 234, 0.784);
+   border: 5px solid rgb(211, 211, 76);
+   border-radius: 5px;
+}
+
+.song_info_title {
+   margin: 10px 0;
+   font-size: 32px;
+   font-family: "Kosugi Maru", sans-serif;
+   padding: 5px 10px;
+   border: 2px solid rgb(2, 61, 57);
+   border-radius: 5px;
+   background-color: rgb(223, 229, 140);
+}
+
+.song_info_area {
+	display: flex;
+   flex-flow: column;
+	width: 80%;
+}
+
+.song_info_row,
+.song_info_row_note {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin: 14px auto 8px auto;
+	min-width: 500px;
+}
+
+.song_info_row_note {
+	justify-content: space-around;
+	margin: 0px auto;
+	min-width: 400px;
+}
+
+
+.song_info_row_double {
+	justify-content: center;
+}
+
+.song_info_row p,
+.song_info_row span{
+	font-size: 40px;
+   font-family: "Kosugi Maru", sans-serif;
+}
+
+.song_info_row span {
+	font-size: 25px;
+}
+
+.song_info_rate {
+	font-size: 15px;
+}
+
+.song_info_note {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.song_info_note p {
+	font-size: 20px;
+	font-family: "Kosugi Maru", sans-serif;
+}
+
+.song_info_top {
+	display: flex;
+	flex-flow: column;
+	align-items: center;
+	margin: 0 30px;
+}
+
+.song_info_top p {
+	font-size: 32px;
+}
+
+.song_info_img {
+	height: 40px;
+}
+
+.song_info_img_note {
+	height: 30px;
+	margin-right: 5px;
+}
+
+.song_info_img_top {
+	margin: 0 auto;
+}
+
+.song_radar {
+   display: flex;
+   flex-flow: column;
+   align-items: center;
+   width: 90%;
+   margin: 0 auto 20px auto;
+   background-color: rgba(234, 255, 250, 0.281);
+   border: 5px solid rgb(101, 245, 204);
+   border-radius: 5px;
+}
+
+.song_radar_title {
+   margin: 10px 0;
+   font-size: 32px;
+   font-family: "Kosugi Maru", sans-serif;
+   padding: 5px 10px;
+   border: 2px solid rgb(2, 61, 57);
+   border-radius: 5px;
+   background-color: rgb(108, 255, 213);
+}
+
+.graph_radar {
+	max-height: 625px;
+	padding: 20px 0;
+}
+
+@media (max-width: 770px) {
+
+	.song_info {
+		width: 92.5%;
+	}
+
+	.song_info_area {
+		width: 90%;
+	}
+
+	.song_info_row p {
+		font-size: 30px;
+	}
+
+	.song_info_row span {
+		font-size: 16px;
+	}
+	
+	.song_info_row,
+	.song_info_row_note {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		width: 90%;
+		min-width: 280px;
+	}
+
+	.song_info_row {
+		margin: 14px auto 8px auto;
+	}
+
+	.song_info_row_note {
+		justify-content: space-around;
+		margin: 0px auto;
+	}
+
+	.song_info_img {
+		height: 30px;
+	}
+
+	.song_info_row_double {
+		justify-content: space-around;
+	}
+
+   .song_info_top {
+		margin: 0 10px;
+   }
+
+	.song_info_top p {
+		font-size: 25px;
+	}
+
+	.graph_radar {
+		max-height: none;
+		padding: 20px 0;
+	}
+}

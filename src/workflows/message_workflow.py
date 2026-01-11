@@ -138,7 +138,7 @@ class ProcessMessageWorkflow:
             response = await workflow.execute_activity(
                 step4_invoke_llm_activity,
                 args=[parsed_input_dict, context_dict, song_info],
-                start_to_close_timeout=timedelta(seconds=60),  # 60 second timeout (LLM can be slow)
+                start_to_close_timeout=timedelta(seconds=45),  # 45 second timeout (optimized from 60s, HTTP client timeout is 25s)
                 retry_policy=RETRY_POLICY,
             )
         except Exception as llm_error:

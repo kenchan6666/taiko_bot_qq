@@ -1,0 +1,57 @@
+.userlist_filter {
+  display: flex;
+  justify-content: center;
+}
+
+.userlist_filter_input {
+	display: flex;
+	flex-flow: column;
+	justify-content: center;
+}
+
+.userlist_filter_select {
+	margin-bottom: 10px;
+}
+
+@media (max-width: 580px) {
+  .userlist_filter {
+    flex-flow: column;
+  }
+}
+
+.filter_rating {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin: 10px auto 0 auto;
+	max-width: 370px;
+}
+
+.userlist_input_rating {
+	width: 10%;
+	min-width: 90px;
+	height: 40px;
+	font-size: 20px;
+	padding: 7.5px;
+	border: 0.5px solid rgb(179, 179, 179);
+	border-radius: 5px;
+	text-align: center;
+	margin: auto auto;
+}
+
+.filter_rating input::-webkit-outer-spin-button,
+.filter_rating input::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+.filter_rating input[type="number"] {
+	appearance: textfield; /* 標準のCSSプロパティ */
+	-moz-appearance: textfield; /* Firefox対応 */
+	-webkit-appearance: textfield; /* Safari対応 */
+}
+
+.filter_rating span {
+	font-family: "Kosugi Maru", sans-serif;
+	font-size: 30px;
+ }

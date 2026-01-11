@@ -1,0 +1,471 @@
+.info_profile_user {
+  display: flex;
+  margin-bottom: 35px;
+}
+
+.info-right_top {
+  display: flex;
+  width: 85%;
+  margin: 0.5px 40px;
+  font-size: 20px;
+  font-family: "DotGothic16", sans-serif;
+  font-weight: 200;
+  font-style: normal;
+}
+
+.profile-column span{
+	margin-top: 5px;
+	font-family: "Kosugi Maru", sans-serif;
+  white-space: nowrap;
+}
+
+.number-column {
+	font-family: "Kosugi Maru", sans-serif;
+  cursor: text;
+}
+
+.number-column a {
+	font-family: "Kosugi Maru", sans-serif;
+  pointer-events: none;
+  text-decoration: none;
+  color: black;
+}
+
+.taiko_rating-column {
+	font-family: "Kosugi Maru", sans-serif;
+  white-space: nowrap;
+}
+
+.area-column {
+	font-family: "Kosugi Maru", sans-serif;
+  white-space: nowrap;
+}
+
+.user_image {
+  width: 37%;
+  height: 100%;
+  min-height: 300px;
+  background-color: #d3f9ff;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-flow: column;
+  margin: auto 0;
+  text-align: center;
+}
+
+.user_data {
+  width: 63%;
+  justify-content: space-between;
+  margin-left: 20px;
+}
+
+.donder_nameplate {
+  margin: 10px auto 20px auto;
+  border: 2px solid black;
+  width: 100%;
+  max-width: 300px;
+}
+
+.donder_img {
+  width: 70%;
+  border-radius: 60px;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -user-drag: none;
+}
+
+.user_sns_wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 13.5px auto 0 auto;
+  width: 100%;
+}
+
+.user_data_profile {
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  height: 30%;
+  padding-top: 3px;
+  border: 3px dotted rgba(255, 98, 46, 0.445);
+  border-radius: 30px;
+  margin-bottom: 30px;
+}
+
+.user_data_profile p {
+	font-family: "Kosugi Maru", sans-serif;
+  font-style: normal;
+}
+
+.comment-box {
+  margin: 5px 0 20px 0;
+  height: 18%;
+}
+
+.comment-title {
+  width: 200px;
+  text-align: center;
+  padding: 2px;
+  margin: 0 auto;
+  justify-content: center;
+  border-top: 2px solid rgba(99, 191, 227);
+  border-left: 2px solid rgba(99, 191, 227);
+  border-right: 2px solid rgba(99, 191, 227);
+  border-radius: 7.8px 7.8px 0 0;
+  font-size: 18px;
+  font-family: "DotGothic16", sans-serif;
+  font-style: normal;
+  font-weight: bold;
+}
+
+.comment_large-title {
+  width: 200px;
+  text-align: center;
+  padding: 2px;
+  margin: 35px auto 0 auto;
+  border-top: 2px solid rgba(255, 100, 22);
+  border-left: 2px solid rgba(255, 100, 22);
+  border-right: 2px solid rgba(255, 100, 22);
+  border-radius: 7.8px 7.8px 0 0;
+  font-size: 20px;
+  font-family: "DotGothic16", sans-serif;
+  font-style: normal;
+  font-weight: bold;
+}
+
+.comment_large-column {
+  white-space: pre-wrap;
+}
+
+.comment_text {
+  display: flex;
+  align-items: center;
+  height: 70%;
+  padding: 3px 4px;
+  margin: 0 auto 2px auto;
+  border: 1px solid rgba(46, 153, 195, 0.575);
+  border-radius: 10px;
+  font-size: 15.5px;
+}
+
+@media (max-width: 750px) {
+	.comment_text {
+		font-size: 12px;
+	}
+}
+
+.comment_text_large {
+  padding: 5px 12px;
+  width: 100%;
+  margin: 0 auto;
+  border: 1px solid rgba(255, 100, 22, 0.575);
+  border-radius: 10px;
+  font-size: 15.5px;
+}
+
+.name-column {
+  background-color: white;
+  font-size: 20px;
+  font-weight: bold;
+  padding: 3px;
+  font-family: "FOT-大江戸勘亭流 Std E", "UDデジタル教科書体N-R", sans-serif;
+}
+
+.donder_name-column {
+	font-family: "Kosugi Maru", sans-serif;
+	white-space: nowrap;
+	font-size: 13px;
+}
+
+.donder_name-column > span {
+  font-family: "FOT-大江戸勘亭流 Std E", "UDデジタル教科書体N-R", sans-serif;
+}
+
+.title-column {
+  padding: 3px;
+  border-bottom: 2px double black;
+  background-color: rgb(225, 71, 0);
+  font-family: "FOT-大江戸勘亭流 Std E", "UDデジタル教科書体N-R", sans-serif;
+}
+
+.rating-wrapper{
+	width: 100%;
+	display: flex;
+	flex-flow: column;
+	justify-content: center;
+	padding: 20px 0;
+	margin: 30px auto 40px 0;
+	border: 3px double rgb(54, 149, 79);
+	border-radius: 10px;
+	background-image: url("/image/rating_background.png");
+	background-color:rgba(255,255,255,0.9);
+	background-blend-mode:lighten;
+	background-size: 10px;
+}
+
+.rating_area{
+	display: flex;
+	justify-content: center;
+}
+
+.rating_link{
+	width: 50%;
+	margin: 20px auto;
+	text-align: center;
+	width: 90%;
+}
+
+.rating_link :hover{
+	opacity: 0.85;
+	transition: 0.5s;
+}
+
+.rating_link p{
+	font-size: 30px;
+}
+
+.rating_link a{
+	display: block;
+	font-family: "Kosugi Maru", sans-serif;
+	text-decoration: none;
+	color: rgb(91, 91, 91);
+	padding: 10px 10px;
+	background-color: #4ae9d9;
+	border: 3px solid #43d3b1;
+	border-radius: 10px;
+	box-shadow: 0 4px 0 0 #43d3b1;
+}
+
+.rating_link_difficulty a{
+	background-color: #f79a47;
+	border: 3px solid #df8939;
+	box-shadow: 0 4px 0 0 #df8939;
+}
+
+.rating_link a:active{
+	top: 4px;
+	box-shadow: none;
+	transition: 0s;
+}
+
+.rating_link_title{
+	font-family: "Kosugi Maru", sans-serif;
+	font-size: 60px;
+	margin: 0 0 20px 0;
+	border-bottom: 3px double rgb(54, 149, 79);
+	line-height: 37px;
+}
+
+.rating_box{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-flow: column;
+	margin: 0 30px;
+	padding: 10px 16px;
+	height: 38%;
+	background-size: 104% 105%;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+
+.rating_box_purple {
+	background-image: url("/image/title_background/title_background_purple.png");
+	color: rgb(222, 208, 79);
+}
+
+.rating_box_pink {
+	background-image: url("/image/title_background/title_background_pink.png");
+}
+
+.rating_box_gold {
+	background-image: url("/image/title_background/title_background_gold.png");
+}
+
+.rating_box_silver {
+	background-image: url("/image/title_background/title_background_silver.png");
+}
+
+.rating_box_red {
+	background-image: url("/image/title_background/title_background_red.png");
+}
+
+.rating_box_blue {
+	background-image: url("/image/title_background/title_background_blue.png");
+}
+
+.rating_box_wood {
+	background-image: url("/image/title_background/title_background_wood.png");
+}
+
+.rating_box_mecha {
+	background-image: url("/image/title_background/title_background_mecha.png");
+	background-size: 100% 100%;
+}
+
+.rating_title{
+	width: 96%;
+	max-width:300px;
+	margin: 0 auto;
+	top: 5px;
+}
+
+.rating_number{
+	font-size: 45px;
+	font-family: "Kosugi Maru", sans-serif;
+	text-align: center;
+}
+
+
+@media (max-width:660px) {
+	.rating_box{
+		margin: 0 20px;
+		padding: 10px 12px;
+		width: 40%;
+		max-height: none;
+	}
+
+	.rating_title {
+		top: 5px;
+	}
+
+	.rating_number{
+		font-size: 36px;
+	}
+}
+
+@media(max-width: 430px) {
+	.rating_link_title{
+		font-size: 60px;
+	}
+
+	.rating_link p{
+		font-size: 20px;
+	}
+	
+	.rating_number{
+		font-size: 30px;
+	}
+}
+
+@media (max-width: 820px) {
+  .title-column {
+    font-size: 13px;
+  }
+}
+
+.dan_i_past-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 18px 0;
+  width: 100%;
+  background-image: url("/image/menuBar_background_fold.png");
+  background-size: 20%;
+  border: 6px solid #e9d343df;
+  border-radius: 40px;
+}
+
+.dan_i_box_pc {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100px;
+  min-width: 135px;
+  height: 65px;
+  min-height: 110px;
+  background-color: #bed83e;
+  border-radius: 100px;
+  margin: 6px 15px;
+}
+
+.dan_i_text_pc {
+  text-align: center;
+  font-size: 17px;
+  font-family: "Kosugi Maru", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.dan_i_box_sp {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  width: 205px;
+  min-width: 205px;
+  height: 50px;
+  min-height: 30px;
+  background-color: #0acc2a;
+  border-radius: 30px;
+  margin: 12px 15px 0 15px;
+}
+
+.dan_i_text_sp {
+  display: none;
+  text-align: center;
+  font-size: 17px;
+  font-family: "Kosugi Maru", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+}
+
+@media (max-width: 640px) {
+  .info_profile_user {
+    flex-flow: column;
+    justify-content: center;
+    align-items: center;
+	 margin-bottom: 0px;
+  }
+
+  .user_image {
+    width: 90%;
+    margin-bottom: 40px;
+  }
+
+  .donder_img {
+    justify-content: center;
+    width: 240px;
+  }
+
+  .donder_nameplate {
+    margin: 10px auto 20px auto;
+    width: 100%;
+    min-width: 200px;
+  }
+
+  .user_data {
+    margin-left: auto;
+    width: 100%;
+  }
+
+  .user_data_profile{
+	margin-bottom: 40px;
+  }
+
+
+  .comment_text {
+    width: 100%;
+	 padding: 7px 12px;
+  }
+
+  .comment_text_large {
+	font-size: 12px;
+  }
+
+  .dan_i_box_pc,
+  .dan_i_text_pc {
+    display: none;
+  }
+
+  .dan_i_box_sp {
+    display: flex;
+  }
+
+  .dan_i_text_sp {
+    display: inline;
+  }
+}

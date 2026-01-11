@@ -5,6 +5,7 @@ This module provides song query functionality with:
 - taikowiki JSON fetching
 - In-memory caching with periodic refresh (hourly)
 - Fuzzy matching using rapidfuzz library
+- Real difficulty data from difficulty table (fumen-database)
 
 Per FR-002: System MUST provide accurate information about Taiko no Tatsujin
 songs when queried, including difficulty ratings and BPM. System MUST implement
@@ -29,6 +30,12 @@ from rapidfuzz import process
 _songs_cache: list[dict] = []
 _cache_timestamp: Optional[datetime] = None
 _cache_refresh_interval = timedelta(hours=1)  # Hourly refresh per FR-002
+
+# In-memory difficulty cache (from fumen-database difficulty table)
+# Structure: dict mapping song name to difficulty info
+# Keys: name -> {real_difficulty, difficulty_category, stars, bpm, genre, url}
+_difficulty_cache: dict[str, dict] = {}
+_difficulty_cache_timestamp: Optional[datetime] = None
 
 
 class SongQueryService:
@@ -101,7 +108,20 @@ class SongQueryService:
         else:
             # PRIMARY: Try taikowiki API first
             try:
-                async with httpx.AsyncClient(timeout=30.0) as client:
+                # Performance optimization: Use optimized timeout settings for faster failure detection
+                async with httpx.AsyncClient(
+                    timeout=httpx.Timeout(
+                        connect=5.0,   # Connection timeout: 5s
+                        read=20.0,     # Read timeout: 20s (reduced from 30s)
+                        write=5.0,     # Write timeout: 5s
+                        pool=3.0,      # Pool timeout: 3s
+                    ),
+                    limits=httpx.Limits(
+                        max_keepalive_connections=5,
+                        max_connections=10,
+                        keepalive_expiry=20.0,
+                    ),
+                ) as client:
                     response = await client.get(self.json_url)
                     response.raise_for_status()
                     data = response.json()
@@ -336,13 +356,20 @@ class SongQueryService:
             threshold: Similarity threshold (0.0-1.0, default: 0.7).
 
         Returns:
-            Best matching song dict, or None if no match found.
+            Best matching song dict with difficulty info, or None if no match found.
+            Song dict includes:
+            - name: str
+            - difficulty_stars: int (1-10)
+            - bpm: int
+            - metadata: dict
+            - real_difficulty: float (optional, from difficulty database)
+            - difficulty_category: str (optional, 超级难/很难/难/中等/其他)
 
         Example:
             >>> service = SongQueryService()
             >>> song = service.query_song("千本桜")
-            >>> print(song["name"], song["bpm"])
-            "千本桜" 200
+            >>> print(song["name"], song["bpm"], song.get("real_difficulty"))
+            "千本桜" 200 10.2
         """
         global _songs_cache
 
@@ -367,8 +394,19 @@ class SongQueryService:
 
         matched_name, score, index = result
 
-        # Return the matched song
-        return _songs_cache[index].copy()
+        # Get base song info
+        song = _songs_cache[index].copy()
+        
+        # Enrich with difficulty info if available
+        difficulty_info = self.get_difficulty_info(matched_name)
+        if difficulty_info:
+            song['real_difficulty'] = difficulty_info.get('real_difficulty')
+            song['difficulty_category'] = difficulty_info.get('difficulty_category')
+            # Override BPM if difficulty database has more accurate info
+            if difficulty_info.get('bpm') and not song.get('bpm'):
+                song['bpm'] = difficulty_info.get('bpm')
+
+        return song
 
     def get_all_songs(self) -> list[dict]:
         """
@@ -379,6 +417,145 @@ class SongQueryService:
         """
         global _songs_cache
         return _songs_cache.copy()
+    
+    def load_difficulty_database(self) -> bool:
+        """
+        Load difficulty database from local JSON file.
+        
+        Loads real difficulty data from data/song_difficulty_database.json.
+        This data includes real_difficulty, difficulty_category, etc.
+        
+        Returns:
+            True if loaded successfully, False otherwise.
+        """
+        global _difficulty_cache, _difficulty_cache_timestamp
+        
+        try:
+            from src.config import settings
+            difficulty_file = Path(settings.taikowiki_local_json_path).parent / "song_difficulty_database.json"
+            if not difficulty_file.is_absolute():
+                difficulty_file = Path(__file__).parent.parent.parent / difficulty_file
+            
+            if not difficulty_file.exists():
+                print(f"Warning: Difficulty database not found: {difficulty_file}")
+                return False
+            
+            with open(difficulty_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            # Build a name -> difficulty_info mapping for fast lookup
+            _difficulty_cache = {}
+            for song in data.get('songs', []):
+                name = song.get('name', '').strip()
+                if name:
+                    _difficulty_cache[name] = {
+                        'real_difficulty': song.get('real_difficulty'),
+                        'difficulty_category': song.get('difficulty_category'),
+                        'stars': song.get('stars'),
+                        'bpm': song.get('bpm'),
+                        'genre': song.get('genre'),
+                        'url': song.get('url'),
+                    }
+            
+            _difficulty_cache_timestamp = datetime.utcnow()
+            print(f"Loaded {len(_difficulty_cache)} songs from difficulty database")
+            return True
+        except Exception as e:
+            print(f"Warning: Failed to load difficulty database: {e}")
+            return False
+    
+    def get_difficulty_info(self, song_name: str) -> Optional[dict]:
+        """
+        Get real difficulty information for a song.
+        
+        Args:
+            song_name: Song name to look up.
+            
+        Returns:
+            Difficulty info dict with keys:
+            - real_difficulty: float (e.g., 10.2)
+            - difficulty_category: str (超级难, 很难, 难, 中等, 其他)
+            - stars: int (e.g., 10)
+            - bpm: int (optional)
+            - genre: str (optional)
+            - url: str (optional)
+            Or None if not found.
+        """
+        global _difficulty_cache
+        
+        # Ensure difficulty cache is loaded
+        if not _difficulty_cache and _difficulty_cache_timestamp is None:
+            self.load_difficulty_database()
+        
+        # Exact match first
+        if song_name in _difficulty_cache:
+            return _difficulty_cache[song_name].copy()
+        
+        # Fuzzy match
+        if _difficulty_cache:
+            song_names = list(_difficulty_cache.keys())
+            result = process.extractOne(
+                song_name,
+                song_names,
+                score_cutoff=80,  # 80% similarity threshold
+            )
+            if result:
+                matched_name, score, _ = result
+                return _difficulty_cache[matched_name].copy()
+        
+        return None
+    
+    def get_songs_by_difficulty(
+        self,
+        difficulty_category: Optional[str] = None,
+        min_difficulty: Optional[float] = None,
+        max_difficulty: Optional[float] = None,
+        limit: int = 10,
+    ) -> list[dict]:
+        """
+        Get songs by difficulty category or range.
+        
+        Args:
+            difficulty_category: Category to filter by (超级难, 很难, 难, 中等, 其他)
+            min_difficulty: Minimum real_difficulty (inclusive)
+            max_difficulty: Maximum real_difficulty (inclusive)
+            limit: Maximum number of songs to return (default: 10)
+            
+        Returns:
+            List of song dicts matching the criteria.
+        """
+        global _difficulty_cache
+        
+        # Ensure difficulty cache is loaded
+        if not _difficulty_cache and _difficulty_cache_timestamp is None:
+            self.load_difficulty_database()
+        
+        if not _difficulty_cache:
+            return []
+        
+        results = []
+        for name, info in _difficulty_cache.items():
+            # Filter by category
+            if difficulty_category and info.get('difficulty_category') != difficulty_category:
+                continue
+            
+            # Filter by difficulty range
+            real_difficulty = info.get('real_difficulty')
+            if real_difficulty is not None:
+                if min_difficulty is not None and real_difficulty < min_difficulty:
+                    continue
+                if max_difficulty is not None and real_difficulty > max_difficulty:
+                    continue
+            
+            results.append({
+                'name': name,
+                **info,
+            })
+        
+        # Sort by difficulty (descending)
+        results.sort(key=lambda x: x.get('real_difficulty', 0), reverse=True)
+        
+        return results[:limit]
 
 
 # Global song query service instance
@@ -410,3 +587,5 @@ async def initialize_song_cache() -> None:
     """
     service = get_song_service()
     await service.refresh_cache()
+    # Also load difficulty database
+    service.load_difficulty_database()

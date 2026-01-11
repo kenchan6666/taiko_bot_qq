@@ -46,6 +46,18 @@ class Settings(BaseSettings):
     # Per NFR-009: API keys MUST be loaded from environment variables
     # Leave empty in .env.example, provide actual key via environment variable
     openrouter_api_key: Optional[str] = None
+    
+    # LLM Model Configuration
+    # Supported models:
+    # - anthropic/claude-3.5-sonnet (default, recommended, most human-like, better emotion understanding)
+    # - openai/gpt-4o (fast, multimodal, but less human-like)
+    # - anthropic/claude-opus (more powerful but more expensive)
+    # - xai/grok-2 (witty and lively, but higher hallucination rate ~4.8%)
+    # - xai/grok-2-vision-1212 (Grok with vision support)
+    # 
+    # Switch model by setting OPENROUTER_MODEL environment variable:
+    # export OPENROUTER_MODEL=anthropic/claude-3.5-sonnet
+    openrouter_model: str = "anthropic/claude-3.5-sonnet"
 
     # LangBot Configuration
     langbot_webhook_url: str = "http://localhost:8000/webhook/langbot"
@@ -82,7 +94,8 @@ class Settings(BaseSettings):
 
     # Conversation History Limit Configuration
     # Per FR-005: Configurable limit via environment variable
-    conversation_history_limit: int = 10  # Default: 10 conversations
+    # Performance optimization: Reduced default from 10 to 5 to reduce database query size and prompt length
+    conversation_history_limit: int = 5  # Default: 5 conversations (reduced from 10 for performance)
 
     # Message Deduplication Configuration
     # Per FR-008 Enhancement: Configurable similarity threshold and deduplication window

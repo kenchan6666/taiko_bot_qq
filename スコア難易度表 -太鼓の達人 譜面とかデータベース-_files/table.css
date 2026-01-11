@@ -1,0 +1,678 @@
+.table {
+  margin: 0 auto;
+  border-collapse: separate;
+  border-spacing: 0;
+  color: inherit;
+}
+
+.table_crownAndScorerank_wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 1200px) {
+  .table_crownAndScorerank_wrapper {
+    flex-flow: column;
+  }
+}
+
+.table_crownAndScorerank_wrapper th {
+  background-color: #dcdcdc;
+  border-right: 1px solid #6f6f6fe4;
+}
+
+.table_cas_1 th {
+  text-align: center;
+  border-top: 1px solid #1e3a3f;
+}
+
+.table_cas_2 th {
+  text-align: center;
+  border-bottom: 1px solid #6f6f6fe4;
+  border-bottom: 1px solid #6f6f6fe4;
+}
+
+.table_cas {
+  background-color: white;
+  width: 35px;
+  text-align: center;
+  font-family: "Zen Kaku Gothic Antique", sans-serif;
+  font-style: normal;
+  white-space: nowrap;
+}
+
+.table_cas_data {
+  margin: 10px;
+}
+
+.table_cas_left {
+  border-left: 1px solid #6f6f6fe4;
+}
+
+.table_cas_item {
+  font-family: "Zen Kaku Gothic Antique", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.table_cas_image {
+  width: 17px;
+  vertical-align: middle;
+}
+
+.table_cas_title_crown {
+  background: linear-gradient(45deg, #e9c98b 0%, #e9c98b 100%);
+  border-bottom: 1px solid #6f6f6fe4;
+  font-family: "DotGothic16", sans-serif;
+  font-weight: 900;
+  font-style: normal;
+}
+
+.table_cas_title_scorerank {
+  background: linear-gradient(45deg, #c5f990 0%, #c5f990 100%);
+  border-bottom: 1px solid #6f6f6fe4;
+  font-family: "DotGothic16", sans-serif;
+  font-weight: 900;
+  font-style: normal;
+}
+
+.table_cas_type {
+  width: 90px;
+}
+
+th {
+  text-align: left;
+  padding: 3px 4px;
+  font-size: 12px;
+  top: 30;
+}
+
+td {
+  text-align: left;
+  padding: 3px 4px;
+  font-size: 12px;
+}
+
+thead th {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.thead_song_data {
+  margin: 0 auto;
+  z-index: 100;
+  scroll-behavior: smooth;
+  transform-origin: center bottom;
+  display: flex;
+  justify-content: center;
+}
+
+.table_song_data-wrapper {
+  width: auto;
+  max-height: 60vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border: 1px solid #6c7678;
+  background-color: #efefefa6;
+  scrollbar-width: none;
+  display: flex;
+  justify-content: center;
+}
+
+.table_song_data {
+  transform-origin: center top;
+  position: absolute;
+}
+
+.table_song_data-wrapper th {
+  background-color: #dcdcdc;
+  border-right: 1px solid #6f6f6fe4;
+  border-bottom: 2px double #6f6f6fe4;
+  top: 0;
+}
+
+@media (min-width: 840px) {
+  .table_song_data-wrapper {
+    max-height: 85vh;
+  }
+}
+
+.table_song_data-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.table_scrollbar {
+  position: relative;
+  margin: 10px auto 10.25px auto;
+  width: 90%;
+  height: 15px;
+  background-color: #e8e8e8;
+  border: 1.5px solid #bfbfbf;
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
+
+.scrollbar_thumb {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12.5px;
+  /* つまみのサイズ */
+  height: 20px;
+  background: #ededed;
+  border: 2px solid #a4a4a4;
+  cursor: grab;
+  z-index: 20;
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
+
+.table_song_data-wrapper td,
+.table_crownAndScorerank_wrapper td {
+  border-right: 0.5px solid #6f6f6fe4;
+  border-bottom: 0.5px solid #6f6f6fe4;
+}
+
+.table_song_data-wrapper,
+.table_crownAndScorerank_wrapper {
+  border-collapse: collapse;
+}
+
+@media (max-width: 560px) {
+  .table_cas_data {
+    width: 490px;
+  }
+
+  .table_crownAndScorerank_wrapper {
+    background-color: #e9e9e9a1;
+    overflow-x: scroll;
+    border: 2px dotted black;
+    margin: 5px auto 20px auto;
+  }
+}
+
+.table_item_head {
+  max-width: 100%;
+  max-height: 25px;
+  height: auto;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
+
+.table_item_head_sort {
+  max-width: 70%;
+  height: auto;
+  max-height: 25px;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
+
+.table_item_head_sort_large {
+	max-width: 90%;
+	max-height: 35px;
+}
+
+.table_item_arrow {
+  vertical-align: middle;
+  max-width: 50%;
+  height: auto;
+  user-select: none;
+  left: 2px;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
+
+.table_item_arrow_genre {
+  vertical-align: middle;
+  max-width: 50%;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
+
+.table_sort {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.table_center {
+  text-align: center;
+}
+
+.table_song_name {
+  background-color: white;
+  word-break: break-all;
+}
+
+.table_song_name a {
+  font-size: 15px;
+  font-family: "Zen Kaku Gothic Antique", sans-serif;
+  font-style: normal;
+  text-decoration: none;
+  color: #3e5b6a;
+}
+
+.table_song_name a:hover {
+  opacity: 0.7;
+}
+
+.song_name_title {
+  float: left;
+}
+
+.table_bpm {
+  background-color: white;
+  word-wrap: break-word;
+}
+
+.bpm_content {
+  display: none;
+  width: 85px;
+  background-color: #f9f9f9cc;
+  font-family: "Zen Kaku Gothic Antique", sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 9px;
+  border: 0.4px solid #ccc;
+  padding: 10px;
+  transition: 1s;
+}
+
+.bpm_base {
+  font-family: "Zen Kaku Gothic Antique", sans-serif;
+  font-style: normal;
+  display: inline-block;
+  font-size: 13.5px;
+}
+
+.bpm_change {
+  font-family: "Zen Kaku Gothic Antique", sans-serif;
+  font-style: normal;
+  margin-left: 1px;
+  display: inline-block;
+  font-size: 8.5px;
+}
+
+.table_difficulty {
+  text-align: center;
+  width: 40px;
+}
+
+.table_star {
+  font-size: 20px;
+  font-family: "Zen Kaku Gothic Antique", sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  background-color: white;
+  text-align: center;
+}
+
+.table_score {
+  font-size: 21px;
+  font-family: "Zen Kaku Gothic Antique", sans-serif;
+  font-style: normal;
+  font-weight: 200;
+  background-color: white;
+  text-align: center;
+  width: 30px;
+  white-space: nowrap;
+}
+
+.table_rating {
+  font-size: 21px;
+  font-family: "Zen Kaku Gothic Antique", sans-serif;
+  font-style: normal;
+  font-weight: 200;
+  background-color: white;
+  text-align: center;
+  width: 42px;
+  white-space: nowrap;
+}
+
+.table_totalscore {
+  font-size: 19px;
+  font-family: "Zen Kaku Gothic Antique", sans-serif;
+  font-style: normal;
+  font-weight: 200;
+  background-color: white;
+  width: 65px;
+  white-space: nowrap;
+}
+
+.table_totalscore_ten {
+  vertical-align: bottom;
+  font-size: 14px;
+  font-family: "Zen Kaku Gothic Antique", sans-serif;
+  font-weight: 200;
+  font-style: normal;
+}
+
+.table_crown {
+  background-color: white;
+  text-align: center;
+  width: 40px;
+  height: 20px;
+  margin: auto;
+}
+
+.table_crown_image {
+  width: 35px;
+}
+
+.table_scorerank {
+  background-color: white;
+  text-align: center;
+  width: 40px;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.table_scorerank_image {
+  height: 25px;
+  width: auto;
+  vertical-align: middle;
+}
+
+.table_scorerank_data {
+  background-color: white;
+  white-space: nowrap;
+}
+
+.table_grid {
+  display: grid;
+  grid-template-columns: 24px 320px 59px 88px 78px 63px 69px 103px 63px 63px 63px 63px 70px 63px;
+  align-items: center;
+}
+
+.table_grid_difficulty {
+	display: grid;
+	grid-template-columns: 27px 83px 83px 342px 58px 103px 65px 90px 83px 83px 83px 83px;
+	align-items: center;
+ }
+
+.table_grid_header,
+.table_grid_body {
+  width: 100%;
+  height: 100%;
+  padding: 3px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #dcdcdc;
+  border-top: 1px solid #545454;
+  border-bottom: 1px double #545454;
+  border-left: 1px solid #545454;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.table_grid_header_songname {
+  justify-content: left;
+}
+
+.table_grid_body {
+  padding: 2px 3px;
+  border-top: none;
+  border-bottom: 1px double #545454;
+  border-left: 1px solid #545454;
+  background-color: white;
+}
+
+
+.table_grid_body_left {
+  justify-content: left;
+}
+
+.table_grid_right {
+  border-right: 1px solid #545454;
+}
+
+.table_sort_arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.table_sort {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.table_item_arrow {
+  width: 10px;
+}
+
+.table_grid_sortlink {
+  display: contents;
+  width: 100%;
+  height: 100%;
+  text-decoration: none;
+}
+
+.table_genre {
+  text-align: center;
+}
+
+.table_good {
+  font-family: "Zen Kaku Gothic Antique", sans-serif;
+  font-style: normal;
+  font-weight: 200;
+  background-color: rgb(255, 236, 206);
+}
+
+.table_ok {
+  font-family: "Zen Kaku Gothic Antique", sans-serif;
+  font-style: normal;
+  font-weight: 200;
+  background-color: rgb(240, 240, 240);
+}
+
+.table_bad {
+  font-family: "Zen Kaku Gothic Antique", sans-serif;
+  font-style: normal;
+  font-weight: 200;
+  background-color: rgb(212, 212, 236);
+}
+
+.table_combo {
+  font-family: "Zen Kaku Gothic Antique", sans-serif;
+  font-style: normal;
+  font-weight: 200;
+  background-color: #ffe3d6;
+}
+
+.table_roll {
+  font-family: "Zen Kaku Gothic Antique", sans-serif;
+  font-style: normal;
+  font-weight: 200;
+  background-color: rgb(255, 252, 163);
+}
+
+.table_ranking {
+  font-size: 18px;
+  font-family: "Zen Kaku Gothic Antique", sans-serif;
+  font-style: normal;
+  font-weight: 200;
+  background-color: rgb(230, 215, 231);
+}
+
+.table_donder_rating {
+  font-family: "Zen Kaku Gothic Antique", sans-serif;
+  font-style: normal;
+  font-weight: 200;
+  background-color: rgb(233, 255, 253);
+}
+
+.table_power {
+  font-family: "Zen Kaku Gothic Antique", sans-serif;
+  font-style: normal;
+  font-weight: 200;
+  background-color: rgb(216, 255, 224);
+}
+
+.table_null {
+  background-color: rgba(156, 156, 156, 0.686);
+}
+
+.scorelist_crown_table,
+.scorelist_crown_table_userpage {
+  border: 1px solid #1e3a3f;
+  /* width: 20%;
+	max-width: 48.5px;
+	min-width: 40px; */
+  width: 45px;
+  height: 50px;
+  text-align: center;
+  line-height: 130%;
+  padding: 2px 0;
+  white-space: nowrap;
+  margin-top: -1px;
+  margin-left: -1px;
+}
+
+.scorelist_scorerank_table {
+  border: 1px solid #1e3a3f;
+  /* max-width: 39.4px;
+	min-width: 30px;*/
+  width: 45px;
+  height: 50px;
+  text-align: center;
+  line-height: 130%;
+  padding: 2px 3px;
+  white-space: nowrap;
+  margin-top: -1px;
+  margin-left: -1px;
+}
+
+.scorelist_scorerank_table_image,
+.scorelist_scorerank_table_image_userpage {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 20.5px;
+  vertical-align: middle;
+}
+
+.scorelist_table_number,
+.scorelist_table_number_userpage {
+  font-family: "DotGothic16", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.table_dan_i_previous_wrapper {
+  margin: 20px auto;
+  width: 100%;
+}
+
+.table_dan_i_previous_wrapper th {
+  min-width: 40px;
+  text-align: center;
+  background-color: #d0d0d0;
+  border-top: 2px solid #1e3a3f;
+  border-right: 1px solid #8d8d8d84;
+  border-bottom: 2px double #6f6f6fe4;
+  font-size: 13px;
+  font-family: "Kosugi Maru", sans-serif;
+  font-style: normal;
+}
+
+.table_dan_i_previous_wrapper td {
+  width: 43px;
+  border-right: 0.4px solid #8d8d8d84;
+  border-bottom: 0.4px double #8d8d8d84;
+  text-align: center;
+}
+
+.dan_i_previous_table {
+  margin: 20px auto;
+  width: 90%;
+}
+
+.thead_dan_i_previous {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
+
+.table_dan_i_now {
+  font-size: 20px;
+  font-weight: normal;
+}
+
+.table_dan_i_previous {
+  background-color: #f9a9ff4a;
+  font-family: "Kosugi Maru", sans-serif;
+  font-style: normal;
+  letter-spacing: 0.8px;
+  line-height: 18px;
+}
+
+.table_dan_i_number {
+  background-color: #e0ff9372;
+  font-size: 13px;
+  font-family: "DotGothic16", sans-serif;
+  font-weight: 300;
+  font-style: normal;
+  letter-spacing: 0.8px;
+}
+
+.table_dan_i_number_color {
+  font-size: 12px;
+  font-family: "DotGothic16", sans-serif;
+  font-weight: 300;
+  font-style: normal;
+  letter-spacing: 0.8px;
+  white-space: nowrap;
+}
+
+.table_dan_i_number_color_red {
+  background-color: #ff714d73;
+}
+
+.table_dan_i_number_color_gold {
+  background-color: #c9c14b5f;
+}
+
+@media (max-width: 1170px) {
+  .dan_i_previous_table {
+    width: 825px;
+  }
+
+  .table_dan_i_previous_wrapper {
+    background-color: #e9e9e9a1;
+    overflow-x: scroll;
+    border: 2px dotted black;
+  }
+}
+
+.load_date_area {
+  margin: 0 auto;
+  text-align: center;
+}
+
+.load_date_area p {
+  font-size: 15px;
+  font-family: "DotGothic16", sans-serif;
+  color: #757575;
+}

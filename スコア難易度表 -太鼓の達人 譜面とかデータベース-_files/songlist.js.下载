@@ -1,0 +1,885 @@
+const table = document.querySelector(".table_song_data");
+if (table) {
+	
+	function song_number() {
+		const table_wrapper = document.querySelector(".table_song_data-wrapper");
+		const thead = document.querySelector(".thead_song_data")
+		const load_date = document.querySelector("#loaddate");
+		const song_error = document.querySelector("#song_error");
+		const song_data = document.querySelectorAll(".filter_selector");
+		const scroll_bar = document.querySelector(".table_scrollbar")
+
+		const hideClasses = ["hide_filter_genre", "hide_filter_star", "hide_filter_difficulty", "hide_filter_crown", "hide_filter_const"];
+		
+		const elements = Array.from(song_data).filter((element) => {
+			return !hideClasses.some(className => element.classList.contains(className));
+		});
+		const total = elements.length;
+
+		if (total === 0) {
+			table_wrapper.style.display = "none";
+			thead.style.display = "none";
+			load_date.style.display = "none";
+			scroll_bar.style.display = "none";
+			song_error.style.display = "";
+		} else {
+			table_wrapper.style.display = "";
+			thead.style.display = "";
+			load_date.style.display = "";
+			scroll_bar.style.display = "";
+			song_error.style.display = "none";
+		}
+	}
+
+	function tableResize() {
+		const table_wrapper = document.querySelector(".table_song_data-wrapper");
+		const table = document.querySelector(".table_song_data");
+		const thead = document.querySelector(".thead_song_data")
+		const container_area = document.querySelector(".container_header");
+		const container_width = container_area.clientWidth;
+		const table_width = table.offsetWidth;
+
+
+		// スケール計算
+		if (table.offsetWidth !== 0){
+			const window_scale = container_width / table_width * 0.95;
+			const scale_value = Math.min(window_scale, 1);
+			table.style.transform = `scale(${scale_value})`;
+			thead.style.transform = `scale(${scale_value})`;
+			//後のイベントリスナーで使う用に倍率を格納
+			table_wrapper.dataset.scaleRate = scale_value;
+		} else {
+			return
+		}
+
+
+		// スケール後の高さを計算
+		const scaled_height = table.getBoundingClientRect().height;
+
+		// table_wrapper の高さをスケール後のテーブルと同じにする
+		table_wrapper.style.height = `${scaled_height}px`;
+
+	}
+
+	function filterPops() {
+		const genre_pops_list = document.querySelectorAll(".genre_pops");
+		const count_pops = document.querySelectorAll(".genre_pops").length;
+		for (let i = 0; i < count_pops; i++) {
+			if (filter_pops.checked) {
+				genre_pops_list[i].classList.remove("hide_filter_genre");
+				genre_pops_list[i].style.display = ""
+			} else {
+				genre_pops_list[i].classList.add("hide_filter_genre");
+			}
+		}
+		song_number();
+		tableResize();
+	}
+
+	function filterAnime() {
+		const genre_anime_list = document.querySelectorAll(".genre_anime");
+		const count_anime = document.querySelectorAll(".genre_anime").length;
+		for (let i = 0; i < count_anime; i++) {
+			if (filter_anime.checked) {
+				genre_anime_list[i].classList.remove("hide_filter_genre");
+				genre_anime_list[i].style.display = ""
+			} else {
+				genre_anime_list[i].classList.add("hide_filter_genre");
+			}
+		}
+		song_number();
+		tableResize();
+	}
+
+	function filterKids() {
+		const genre_kids_list = document.querySelectorAll(".genre_kids");
+		const count_kids = document.querySelectorAll(".genre_kids").length;
+		for (let i = 0; i < count_kids; i++) {
+			if (filter_kids.checked) {
+				genre_kids_list[i].classList.remove("hide_filter_genre");
+				genre_kids_list[i].style.display = ""
+			} else {
+				genre_kids_list[i].classList.add("hide_filter_genre");
+			}
+		}
+		song_number();
+		tableResize();
+	}
+
+	function filterVocaloid() {
+		const genre_vocaloid_list = document.querySelectorAll(".genre_vocaloid");
+		const count_vocaloid = document.querySelectorAll(".genre_vocaloid").length;
+		for (let i = 0; i < count_vocaloid; i++) {
+			if (filter_vocaloid.checked) {
+				genre_vocaloid_list[i].classList.remove("hide_filter_genre");
+				genre_vocaloid_list[i].style.display = ""
+			} else {
+				genre_vocaloid_list[i].classList.add("hide_filter_genre");
+			}
+		}
+		song_number();
+		tableResize();
+	}
+
+	function filterGame() {
+		const genre_game_list = document.querySelectorAll(".genre_game");
+		const count_game = document.querySelectorAll(".genre_game").length;
+		for (let i = 0; i < count_game; i++) {
+			if (filter_game.checked) {
+				genre_game_list[i].classList.remove("hide_filter_genre");
+				genre_game_list[i].style.display = ""
+			} else {
+				genre_game_list[i].classList.add("hide_filter_genre");
+			}
+		}
+		song_number();
+		tableResize();
+	}
+
+	function filterVariety() {
+		const genre_variety_list = document.querySelectorAll(".genre_variety");
+		const count_variety = document.querySelectorAll(".genre_variety").length;
+		for (let i = 0; i < count_variety; i++) {
+			if (filter_variety.checked) {
+				genre_variety_list[i].classList.remove("hide_filter_genre");
+				genre_variety_list[i].style.display = ""
+			} else {
+				genre_variety_list[i].classList.add("hide_filter_genre");
+			}
+		}
+		song_number();
+		tableResize();
+	}
+
+	function filterClassic() {
+		const genre_classic_list = document.querySelectorAll(".genre_classic");
+		const count_classic = document.querySelectorAll(".genre_classic").length;
+		for (let i = 0; i < count_classic; i++) {
+			if (filter_classic.checked) {
+				genre_classic_list[i].classList.remove("hide_filter_genre");
+				genre_classic_list[i].style.display = ""
+			} else {
+				genre_classic_list[i].classList.add("hide_filter_genre");
+			}
+		}
+		song_number();
+		tableResize();
+	}
+
+	function filterNamco() {
+		const genre_namco_list = document.querySelectorAll(".genre_namco");
+		const count_namco = document.querySelectorAll(".genre_namco").length;
+		for (let i = 0; i < count_namco; i++) {
+			if (filter_namco.checked) {
+				genre_namco_list[i].classList.remove("hide_filter_genre");
+				genre_namco_list[i].style.display = ""
+			} else {
+				genre_namco_list[i].classList.add("hide_filter_genre");
+			}
+		}
+		song_number();
+		tableResize();
+	}
+
+	function filterStar1() {
+		const star1_list = document.querySelectorAll(".star1");
+		const count_star1 = document.querySelectorAll(".star1").length;
+		for (let i = 0; i < count_star1; i++) {
+			if (filter_star1.checked) {
+				star1_list[i].classList.remove("hide_filter_star");
+				star1_list[i].style.display = ""
+			} else {
+				star1_list[i].classList.add("hide_filter_star");
+			}
+		}
+		song_number();
+		tableResize();
+	}
+
+	function filterStar2() {
+		const star2_list = document.querySelectorAll(".star2");
+		const count_star2 = document.querySelectorAll(".star2").length;
+		for (let i = 0; i < count_star2; i++) {
+			if (filter_star2.checked) {
+				star2_list[i].classList.remove("hide_filter_star");
+				star2_list[i].style.display = ""
+			} else {
+				star2_list[i].classList.add("hide_filter_star");
+			}
+		}
+		song_number();
+		tableResize();
+	}
+
+	function filterStar3() {
+		const star3_list = document.querySelectorAll(".star3");
+		const count_star3 = document.querySelectorAll(".star3").length;
+		for (let i = 0; i < count_star3; i++) {
+			if (filter_star3.checked) {
+				star3_list[i].classList.remove("hide_filter_star");
+				star3_list[i].style.display = ""
+			} else {
+				star3_list[i].classList.add("hide_filter_star");
+			}
+		}
+		song_number();
+		tableResize();
+	}
+
+	function filterStar4() {
+		const star4_list = document.querySelectorAll(".star4");
+		const count_star4 = document.querySelectorAll(".star4").length;
+		for (let i = 0; i < count_star4; i++) {
+			if (filter_star4.checked) {
+				star4_list[i].classList.remove("hide_filter_star");
+				star4_list[i].style.display = ""
+			} else {
+				star4_list[i].classList.add("hide_filter_star");
+			}
+		}
+		song_number();
+		tableResize();
+	}
+
+	function filterStar5() {
+		const star5_list = document.querySelectorAll(".star5");
+		const count_star5 = document.querySelectorAll(".star5").length;
+		for (let i = 0; i < count_star5; i++) {
+			if (filter_star5.checked) {
+				star5_list[i].classList.remove("hide_filter_star");
+				star5_list[i].style.display = ""
+			} else {
+				star5_list[i].classList.add("hide_filter_star");
+			}
+		}
+		song_number();
+		tableResize();
+	}
+
+	function filterStar6() {
+		const star6_list = document.querySelectorAll(".star6");
+		const count_star6 = document.querySelectorAll(".star6").length;
+		for (let i = 0; i < count_star6; i++) {
+			if (filter_star6.checked) {
+				star6_list[i].classList.remove("hide_filter_star");
+				star6_list[i].style.display = ""
+			} else {
+				star6_list[i].classList.add("hide_filter_star");
+			}
+		}
+		song_number();
+		tableResize();
+	}
+
+	function filterStar7() {
+		const star7_list = document.querySelectorAll(".star7");
+		const count_star7 = document.querySelectorAll(".star7").length;
+		for (let i = 0; i < count_star7; i++) {
+			if (filter_star7.checked) {
+				star7_list[i].classList.remove("hide_filter_star");
+				star7_list[i].style.display = ""
+			} else {
+				star7_list[i].classList.add("hide_filter_star");
+			}
+		}
+		song_number();
+		tableResize();
+	}
+
+	function filterStar8() {
+		const star8_list = document.querySelectorAll(".star8");
+		const count_star8 = document.querySelectorAll(".star8").length;
+		for (let i = 0; i < count_star8; i++) {
+			if (filter_star8.checked) {
+				star8_list[i].classList.remove("hide_filter_star");
+				star8_list[i].style.display = ""
+			} else {
+				star8_list[i].classList.add("hide_filter_star");
+			}
+		}
+		song_number();
+		tableResize();
+	}
+
+	function filterStar9() {
+		const star9_list = document.querySelectorAll(".star9");
+		const count_star9 = document.querySelectorAll(".star9").length;
+		for (let i = 0; i < count_star9; i++) {
+			if (filter_star9.checked) {
+				star9_list[i].classList.remove("hide_filter_star");
+				star9_list[i].style.display = ""
+			} else {
+				star9_list[i].classList.add("hide_filter_star");
+			}
+		}
+		song_number();
+		tableResize();
+	}
+
+	function filterStar10() {
+		const star10_list = document.querySelectorAll(".star10");
+		const count_star10 = document.querySelectorAll(".star10").length;
+		for (let i = 0; i < count_star10; i++) {
+			if (filter_star10.checked) {
+				star10_list[i].classList.remove("hide_filter_star");
+				star10_list[i].style.display = ""
+			} else {
+				star10_list[i].classList.add("hide_filter_star");
+			}
+		}
+		song_number();
+		tableResize();
+	}
+
+	function filterEasy() {
+		const easy_list = document.querySelectorAll(".difficulty_easy");
+		const count_easy = document.querySelectorAll(".difficulty_easy").length;
+		for (let i = 0; i < count_easy; i++) {
+			if (filter_easy.checked) {
+				easy_list[i].classList.remove("hide_filter_difficulty");
+				easy_list[i].style.display = ""
+			} else {
+				easy_list[i].classList.add("hide_filter_difficulty");
+			}
+		}
+		song_number();
+		tableResize();
+	}
+
+	function filterNormal() {
+		const normal_list = document.querySelectorAll(".difficulty_normal");
+		const count_normal = document.querySelectorAll(".difficulty_normal").length;
+		for (let i = 0; i < count_normal; i++) {
+			if (filter_normal.checked) {
+				normal_list[i].classList.remove("hide_filter_difficulty");
+				normal_list[i].style.display = ""
+			} else {
+				normal_list[i].classList.add("hide_filter_difficulty");
+			}
+		}
+		song_number();
+		tableResize();
+	}
+
+	function filterHard() {
+		const hard_list = document.querySelectorAll(".difficulty_hard");
+		const count_hard = document.querySelectorAll(".difficulty_hard").length;
+		for (let i = 0; i < count_hard; i++) {
+			if (filter_hard.checked) {
+				hard_list[i].classList.remove("hide_filter_difficulty");
+				hard_list[i].style.display = ""
+			} else {
+				hard_list[i].classList.add("hide_filter_difficulty");
+			}
+		}
+		song_number();
+		tableResize();
+	}
+
+	function filterExtreme() {
+		const extreme_list = document.querySelectorAll(".difficulty_extreme");
+		const count_extreme = document.querySelectorAll(".difficulty_extreme").length;
+		for (let i = 0; i < count_extreme; i++) {
+			if (filter_extreme.checked) {
+				extreme_list[i].classList.remove("hide_filter_difficulty");
+				extreme_list[i].style.display = ""
+			} else {
+				extreme_list[i].classList.add("hide_filter_difficulty");
+			}
+		}
+		song_number();
+		tableResize();
+	}
+
+	function filterHidden() {
+		const hidden_list = document.querySelectorAll(".difficulty_hidden");
+		const count_hidden = document.querySelectorAll(".difficulty_hidden").length;
+		for (let i = 0; i < count_hidden; i++) {
+			if (filter_hidden.checked) {
+				hidden_list[i].classList.remove("hide_filter_difficulty");
+				hidden_list[i].style.display = ""
+			} else {
+				hidden_list[i].classList.add("hide_filter_difficulty");
+			}
+		}
+		song_number();
+		tableResize();
+	}
+
+	function filterCrownSliver() {
+		const crown_silver_list = document.querySelectorAll(".crown_silver");
+		const count_crown_silver = document.querySelectorAll(".crown_silver").length;
+		for (let i = 0; i < count_crown_silver; i++) {
+			if (filter_crown_silver.checked) {
+				crown_silver_list[i].classList.remove("hide_filter_crown");
+				crown_silver_list[i].style.display = ""
+			} else {
+				crown_silver_list[i].classList.add("hide_filter_crown");
+			}
+		}
+		song_number();
+		tableResize();
+	}
+
+	function filterCrownGold() {
+		const crown_gold_list = document.querySelectorAll(".crown_gold");
+		const count_crown_gold = document.querySelectorAll(".crown_gold").length;
+		for (let i = 0; i < count_crown_gold; i++) {
+			if (filter_crown_gold.checked) {
+				crown_gold_list[i].classList.remove("hide_filter_crown");
+				crown_gold_list[i].style.display = ""
+			} else {
+				crown_gold_list[i].classList.add("hide_filter_crown");
+			}
+		}
+		song_number();
+		tableResize();
+	}
+
+	function filterCrownRainbow() {
+		const crown_rainbow_list = document.querySelectorAll(".crown_rainbow");
+		const count_crown_ranibow = document.querySelectorAll(".crown_rainbow").length;
+		for (let i = 0; i < count_crown_ranibow; i++) {
+			if (filter_crown_rainbow.checked) {
+				crown_rainbow_list[i].classList.remove("hide_filter_crown");
+				crown_rainbow_list[i].style.display = ""
+			} else {
+				crown_rainbow_list[i].classList.add("hide_filter_crown");
+			}
+		}
+		song_number();
+		tableResize();
+	}
+
+	function filterCrownNone() {
+		const crown_none_list = document.querySelectorAll(".crown_none");
+		const count_crown_none = document.querySelectorAll(".crown_none").length;
+		for (let i = 0; i < count_crown_none; i++) {
+			if (filter_crown_none.checked) {
+				crown_none_list[i].classList.remove("hide_filter_crown");
+				crown_none_list[i].style.display = ""
+			} else {
+				crown_none_list[i].classList.add("hide_filter_crown");
+			}
+		}
+		song_number();
+		tableResize();
+	}
+
+	function filterConstPlusMin() {
+		let filter_num_const_min = parseFloat(filter_input_const_min.value);
+		if (filter_num_const_min < 6) {
+			filter_newNum_const_min = filter_num_const_min + 0.5;
+		} else if (filter_num_const_min >= 6 && filter_num_const_min < 7) {
+			filter_newNum_const_min = filter_num_const_min + 0.2;
+		} else {
+			filter_newNum_const_min = filter_num_const_min + 0.1;
+		}
+		if (filter_newNum_const_min > 11.6) {
+			filter_newNum_const_min = 11.6;
+		} else if (
+			filter_newNum_const_min > parseFloat(filter_input_const_max.value)
+		) {
+			filter_newNum_const_min = parseFloat(filter_input_const_max.value);
+		}
+		filter_input_const_min.value = filter_newNum_const_min.toFixed(1);
+
+		filterConst();
+	}
+
+	function filterConstPlusMax() {
+		let filter_num_const_max = parseFloat(filter_input_const_max.value);
+		if (filter_num_const_max < 6) {
+			filter_newNum_const_max = filter_num_const_max + 0.5;
+		} else if (filter_num_const_max >= 6 && filter_num_const_max < 7) {
+			filter_newNum_const_max = filter_num_const_max + 0.2;
+		} else {
+			filter_newNum_const_max = filter_num_const_max + 0.1;
+		}
+
+		if (filter_newNum_const_max > 11.6) {
+			filter_newNum_const_max = 11.6;
+		} else if (
+			filter_newNum_const_max < parseFloat(filter_input_const_min.value)
+		) {
+			filter_newNum_const_max = parseFloat(filter_input_const_min.value);
+		}
+		filter_input_const_max.value = filter_newNum_const_max.toFixed(1);
+
+		filterConst();
+	}
+
+	function filterConstMinusMin() {
+		let filter_num_const_min = parseFloat(filter_input_const_min.value);
+		if (filter_num_const_min <= 6) {
+			filter_newNum_const_min = filter_num_const_min - 0.5;
+		} else if (filter_num_const_min > 6 && filter_num_const_min <= 7) {
+			filter_newNum_const_min = filter_num_const_min - 0.2;
+		} else {
+			filter_newNum_const_min = filter_num_const_min - 0.1;
+		}
+		if (filter_newNum_const_min < 1.0) {
+			filter_newNum_const_min = 1.0;
+		} else if (
+			filter_newNum_const_min > parseFloat(filter_input_const_max.value)
+		) {
+			filter_newNum_const_min = parseFloat(filter_input_const_max.value);
+		}
+		filter_input_const_min.value = filter_newNum_const_min.toFixed(1);
+
+		filterConst();
+	}
+
+	function filterConstMinusMax() {
+		let filter_num_const_max = parseFloat(filter_input_const_max.value);
+		if (filter_num_const_max <= 6) {
+			filter_newNum_const_max = filter_num_const_max - 0.5;
+		} else if (filter_num_const_max > 6 && filter_num_const_max <= 7) {
+			filter_newNum_const_max = filter_num_const_max - 0.2;
+		} else {
+			filter_newNum_const_max = filter_num_const_max - 0.1;
+		}
+		if (filter_newNum_const_max < 1.0) {
+			filter_newNum_const_max = 1.0;
+		} else if (
+			filter_newNum_const_max < parseFloat(filter_input_const_min.value)
+		) {
+			filter_newNum_const_max = parseFloat(filter_input_const_min.value);
+		}
+		filter_input_const_max.value = filter_newNum_const_max.toFixed(1);
+
+		filterConst();
+	}
+
+	function filterConst() {
+		const count_songs = document.querySelectorAll(".filter_selector ");
+		count_songs.forEach((song) => {
+			const song_const_value = parseFloat(song.getAttribute("data-value"));
+			if (
+				song_const_value >= parseFloat(filter_input_const_min.value) &&
+				song_const_value <= parseFloat(filter_input_const_max.value)
+			) {
+				song.classList.remove("hide_filter_const");
+				song.style.display = ""
+			} else {
+				song.classList.add("hide_filter_const");
+			}
+		});
+		tableResize();
+	}
+
+	function ratingMark() {
+		rating_array_parsed = JSON.parse(rating_array)
+		rating_array_parsed.sort((a, b) => b.rating - a.rating);
+		rating_array_parsed.slice(0, 50).forEach((data, index) => {
+			rating_id = document.querySelector("#" + CSS.escape(data['id']));
+			if (index >= 0 && index <= 9) {
+				rating_id.classList.add("rating_mark_purple")
+			} else if (index >= 10 && index <= 19) {
+				rating_id.classList.add("rating_mark_gold")
+			} else if (index >= 20 && index <= 49) {
+				rating_id.classList.add("rating_mark_silver")
+			}
+		});
+	}
+
+	function scrollbarMake() {
+		const table_content = document.querySelector(".table_song_data-wrapper");
+		const thumb = document.querySelector(".scrollbar_thumb");
+		const scrollbar = document.querySelector(".table_scrollbar");
+
+		let is_drag = false;
+		let start_x, start_left;
+
+		// つまみをドラッグする処理（マウス & タッチ）
+		function onDragStart(e) {
+			is_drag = true;
+			start_x = e.type.includes("touch") ? e.touches[0].clientX : e.clientX;
+			start_left = thumb.offsetLeft;
+			thumb.style.cursor = "grabbing";
+
+			//縦スクロールを停止
+			if (e.type.includes("touch")) {
+				e.preventDefault();
+			}
+
+			document.addEventListener(e.type.includes("touch") ? "touchmove" : "mousemove", onDragMove, {passive: false});
+			document.addEventListener(e.type.includes("touch") ? "touchend" : "mouseup", onDragEnd);
+		}
+
+		// つまみの移動処理
+		function onDragMove(e) {
+			if (!is_drag) return;
+			let clientX = e.type.includes("touch") ? e.touches[0].clientX : e.clientX;
+			let delta_x = clientX - start_x;
+			let new_left = start_left + delta_x;
+
+			// 範囲制限
+			new_left = Math.max(0, Math.min(new_left, scrollbar.clientWidth - thumb.clientWidth));
+			thumb.style.left = new_left + "px";
+
+			// スクロールの位置を更新
+			let thumb_ratio = new_left / (scrollbar.clientWidth - thumb.clientWidth);
+			let table_height_scroll = table_content.scrollHeight - table_content.clientHeight;
+			table_content.scrollTop = table_height_scroll * thumb_ratio;
+
+			if (e.type.includes("touch")) {
+				e.preventDefault();
+			}
+		}
+
+		// つまみを離した時の処理
+		function onDragEnd(e) {
+			is_drag = false;
+			thumb.style.cursor = "grab";
+
+			document.removeEventListener(e.type.includes("touch") ? "touchmove" : "mousemove", onDragMove, {passive: false});
+			document.removeEventListener(e.type.includes("touch") ? "touchend" : "mouseup", onDragEnd);
+		}
+
+		// スクロールバーのつまみ以外をクリックしたときの処理
+		function onScrollBarClick(e) {
+			if (e.target !== thumb) {
+				let clientX = e.type.includes("touch") ? e.touches[0].clientX : e.clientX;
+				start_x = clientX;
+				start_left = thumb.offsetLeft;
+				let start_scrollTop = table_content.scrollTop;
+
+				const maxScrollTop = table_content.scrollHeight - table_content.clientHeight;
+				const click_ratio = (clientX - scrollbar.getBoundingClientRect().left) / scrollbar.clientWidth;
+
+				// スクロール位置とつまみの位置を更新
+				thumb.style.left = click_ratio * (scrollbar.clientWidth - thumb.clientWidth) + "px";
+				table_content.scrollTop = click_ratio * maxScrollTop;
+			}
+		}
+
+		// 表のスクロールに合わせてつまみを移動
+		table_content.addEventListener("scroll", function () {
+			let thumb_ratio = table_content.scrollTop / (table_content.scrollHeight - table_content.clientHeight);
+			let new_left = thumb_ratio * (scrollbar.clientWidth - thumb.clientWidth);
+			thumb.style.left = new_left + "px";
+		});
+
+		// イベントリスナーの追加（マウス & タッチ対応）
+		thumb.addEventListener("mousedown", onDragStart, {passive: false});
+		thumb.addEventListener("touchstart", onDragStart, {passive: false});
+
+		scrollbar.addEventListener("mousedown", onScrollBarClick);
+		scrollbar.addEventListener("touchstart", onScrollBarClick);
+	}
+
+	window.addEventListener("load", tableResize);
+	window.addEventListener("resize", tableResize);
+
+	window.addEventListener("DOMContentLoaded", function () {
+
+
+		const filter_pops = document.querySelector("#filter_pops");
+		const filter_anime = document.querySelector("#filter_anime");
+		const filter_kids = document.querySelector("#filter_kids");
+		const filter_vocaloid = document.querySelector("#filter_vocaloid");
+		const filter_game = document.querySelector("#filter_game");
+		const filter_variety = document.querySelector("#filter_variety");
+		const filter_classic = document.querySelector("#filter_classic");
+		const filter_namco = document.querySelector("#filter_namco");
+		const filter_star1 = document.querySelector("#filter_star1");
+		const filter_star2 = document.querySelector("#filter_star2");
+		const filter_star3 = document.querySelector("#filter_star3");
+		const filter_star4 = document.querySelector("#filter_star4");
+		const filter_star5 = document.querySelector("#filter_star5");
+		const filter_star6 = document.querySelector("#filter_star6");
+		const filter_star7 = document.querySelector("#filter_star7");
+		const filter_star8 = document.querySelector("#filter_star8");
+		const filter_star9 = document.querySelector("#filter_star9");
+		const filter_star10 = document.querySelector("#filter_star10");
+		const filter_easy = document.querySelector("#filter_easy");
+		const filter_normal = document.querySelector("#filter_normal");
+		const filter_hard = document.querySelector("#filter_hard");
+		const filter_extreme = document.querySelector("#filter_extreme");
+		const filter_hidden = document.querySelector("#filter_hidden");
+		const filter_crown_silver = document.querySelector("#filter_crown_silver");
+		const filter_crown_gold = document.querySelector("#filter_crown_gold");
+		const filter_crown_rainbow = document.querySelector("#filter_crown_rainbow");
+		const filter_crown_none = document.querySelector("#filter_crown_none");
+		const filterlist_difficulty = document.querySelector(".filterlist_difficulty");
+		const filterlist_crown = document.querySelector(".filterlist_crown");
+		const const_minminus = document.querySelector("#min_minus");
+		const const_minplus = document.querySelector("#min_plus");
+		const const_maxminus = document.querySelector("#max_minus");
+		const const_maxplus = document.querySelector("#max_plus");
+		const filter_input_const_max = document.querySelector("#filter_input_const_max");
+		const filter_input_const_min = document.querySelector("#filter_input_const_min");
+
+		filterPops();
+		filterAnime();
+		filterKids();
+		filterVocaloid();
+		filterGame();
+		filterVariety();
+		filterClassic();
+		filterNamco();
+		filterStar1();
+		filterStar2();
+		filterStar3();
+		filterStar4();
+		filterStar5();
+		filterStar6();
+		filterStar7();
+		filterStar8();
+		filterStar9();
+		filterStar10();
+		filterEasy();
+		filterNormal();
+		filterHard();
+		filterExtreme();
+		filterHidden();
+
+		if (filterlist_crown) {
+			filterCrownSliver();
+			filterCrownGold();
+			filterCrownRainbow();
+			filterCrownNone();
+		}
+
+
+		if (filter_input_const_max && filter_input_const_min) {
+			ratingMark()
+			filterConst();
+
+			filter_input_const_min.addEventListener("blur", () => {
+				let min_value = parseFloat(filter_input_const_min.value);
+				if (min_value < 1.0) {
+					min_value = 1.0;
+				} else if (min_value > 11.6) {
+					min_value = 11.6;
+				} else if (min_value > parseFloat(filter_input_const_max.value)) {
+					min_value = parseFloat(filter_input_const_max.value);
+				}
+				filter_input_const_min.value = min_value.toFixed(1);
+			});
+
+			filter_input_const_max.addEventListener("blur", () => {
+				let max_value = parseFloat(filter_input_const_max.value);
+				if (max_value < 1.0) {
+					max_value = 1.0;
+				} else if (max_value > 11.6) {
+					max_value = 11.6;
+				} else if (max_value < parseFloat(filter_input_const_min.value)) {
+					max_value = parseFloat(filter_input_const_min.value);
+				}
+				filter_input_const_max.value = parseFloat(max_value).toFixed(1);
+			});
+
+			filter_input_const_min.addEventListener("input", filterConst);
+			filter_input_const_max.addEventListener("input", filterConst);
+
+			const_minminus.addEventListener("click", function () {
+				filterConstMinusMin();
+			});
+
+			const_minplus.addEventListener("click", function () {
+				filterConstPlusMin();
+			});
+
+			const_maxminus.addEventListener("click", function () {
+				filterConstMinusMax();
+			});
+
+			const_maxplus.addEventListener("click", function () {
+				filterConstPlusMax();
+			});
+		}
+
+		filter_genre = [
+			{ genre: filter_pops, filter: filterPops },
+			{ genre: filter_anime, filter: filterAnime },
+			{ genre: filter_kids, filter: filterKids },
+			{ genre: filter_vocaloid, filter: filterVocaloid },
+			{ genre: filter_game, filter: filterGame },
+			{ genre: filter_variety, filter: filterVariety },
+			{ genre: filter_classic, filter: filterClassic },
+			{ genre: filter_namco, filter: filterNamco },
+		]
+
+		filter_genre.forEach(({ genre, filter }) => {
+			if (genre) {
+				genre.addEventListener("click", filter);
+			}
+		});
+
+		filter_star = [
+			{ star: filter_star1, filter: filterStar1 },
+			{ star: filter_star2, filter: filterStar2 },
+			{ star: filter_star3, filter: filterStar3 },
+			{ star: filter_star4, filter: filterStar4 },
+			{ star: filter_star5, filter: filterStar5 },
+			{ star: filter_star6, filter: filterStar6 },
+			{ star: filter_star7, filter: filterStar7 },
+			{ star: filter_star8, filter: filterStar8 },
+			{ star: filter_star9, filter: filterStar9 },
+			{ star: filter_star10, filter: filterStar10 },
+		]
+
+		filter_star.forEach(({ star, filter }) => {
+			if (star) {
+				star.addEventListener("click", filter);
+			}
+		});
+
+		filter_crown = [
+			{ crown: filter_crown_silver, filter: filterCrownSliver },
+			{ crown: filter_crown_gold, filter: filterCrownGold },
+			{ crown: filter_crown_rainbow, filter: filterCrownRainbow },
+			{ crown: filter_crown_none, filter: filterCrownNone },
+		]
+
+		filter_crown.forEach(({ crown, filter }) => {
+			if (crown) {
+				crown.addEventListener("click", filter);
+			}
+		});
+
+		filter_difficulty = [
+			{ difficulty: filter_easy, filter: filterEasy },
+			{ difficulty: filter_normal, filter: filterNormal },
+			{ difficulty: filter_hard, filter: filterHard },
+			{ difficulty: filter_extreme, filter: filterExtreme },
+			{ difficulty: filter_hidden, filter: filterHidden },
+		]
+
+		filter_difficulty.forEach(({ difficulty, filter }) => {
+			if (difficulty) {
+				difficulty.addEventListener("click", filter);
+			}
+		});
+
+		const rows = document.querySelectorAll(".table_row tr");
+
+		const observer = new IntersectionObserver((entries) => {
+			entries.forEach(entry => {
+				if (entry.isIntersecting) {
+					entry.target.style.visibility = "visible";  // すぐに再表示
+					entry.target.style.opacity = "1"; 
+					entry.target.style.display = ""; 
+			} else {
+					if (!entry.boundingClientRect.top) {
+						// 上方向に完全に見えなくなったら display: none
+						entry.target.style.display = "none";
+					} else {
+						entry.target.style.visibility = "hidden"; // 見えなくするがレイアウトは維持
+						entry.target.style.opacity = "0"; 
+					}
+			}
+			});
+		}, {
+			root: null,  // ビューポートを基準に
+			rootMargin: "200px 0px", // 上下200pxのバッファを持たせる
+			threshold: 0
+		});
+
+		rows.forEach(row => observer.observe(row));
+
+		scrollbarMake()
+	});
+}

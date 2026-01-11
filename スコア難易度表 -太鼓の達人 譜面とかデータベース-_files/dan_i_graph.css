@@ -1,0 +1,137 @@
+.graph_dan_i {
+	background-color: #e6f7ff4e;
+	padding: 3px 10px;
+	border: none;
+	box-shadow: 0 0 2px #cff0ff8b;
+	border: 2px dotted #7cebff8f;
+	border-radius: 6px;
+ }
+
+.bar_image {
+	position: relative;
+	overflow: hidden;
+	width: 100%;
+	height: 100%;
+ }
+ 
+ .bar_image_title {
+	display: flex;
+	justify-content: center;
+	width: 80%;
+	margin: 0 auto;
+	padding: 4px 0;
+	background-color: #97ed7845;
+	border-radius: 10px 10px 0 0;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+ }
+ 
+ .bar_image_title p {
+	font-family: "DotGothic16", sans-serif;
+	font-weight: 700;
+	font-style: normal;
+ }
+ 
+ .graph_dan_i_pc {
+	visibility: visible;
+	width: 100%;
+ }
+ 
+ .graph_dan_i_sp {
+	display: none !important;
+ }
+ 
+ @media (max-width: 760px) {
+	.graph_dan_i_pc {
+	  display: none !important;
+	}
+ 
+	.graph_dan_i_sp {
+	  display: block !important;
+	  height: 500px;
+	}
+ }
+ 
+ .graph_dan_i_hidden {
+	display: none !important;
+ }
+ 
+ .dan_i_chart_datatype {
+	display: flex;
+ }
+ 
+ .dan_i_chart_datatype_text {
+	margin: 5px auto 12px auto;
+	text-align: center;
+ }
+ 
+ .dan_i_chart_datatype_text_title {
+	font-size: 18px;
+	font-family: "DotGothic16", sans-serif;
+	font-weight: 700;
+	font-style: normal;
+	margin: 8px 0;
+	border-bottom: 2.5px double gainsboro;
+ }
+ 
+ .dan_i_chart_datatype_text_data {
+	width: 300px;
+	height: 43px;
+ }
+
+.graph_dan_i_legend {
+  position: absolute;
+  left: 70%;
+  margin-top: 7.5px;
+  height: 30px;
+  opacity: 0.8;
+}
+
+.dan_i_chart_compare_wrapper {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  background-image: url("/image/background_screen_bright.png");
+  background-size: 50% auto;
+  border: 4px solid #389aae;
+}
+
+.dan_i_chart_compare_pulldown select {
+  width: 200px;
+  height: 50px;
+  margin: 3px auto 0 auto;
+  padding: 5px 20px;
+  text-align-last: center;
+  font-size: 20px;
+  font-family: "Kosugi Maru", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  background-color: #56d1e9c7;
+}
+
+.dan_i_chart_compare_pulldown option {
+	font-size: 20px;
+	font-family: "Kosugi Maru", sans-serif;
+}
+
+.dan_i_chart_compare_date {
+  width: 350px;
+  text-align: center;
+  font-size: 19.65px;
+  font-family: "DotGothic16", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+  margin: 12px auto;
+  border-bottom: dotted 3px gainsboro;
+}
+
+.dan_i_chart_compare_date span {
+  font-family: "DotGothic16", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+  margin: 0 6px;
+  white-space: nowrap;
+}
+

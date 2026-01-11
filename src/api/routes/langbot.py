@@ -542,102 +542,173 @@ async def _process_webhook_request(
         # Rate limit exceeded - re-raise HTTPException
         raise
 
-    # Start Temporal workflow to process message
+    # Start Temporal workflow to process message (asynchronously)
     # Per T050: Use Temporal workflow instead of direct step calls
     # Per FR-009: Temporal provides retry logic and fault tolerance
+    # CRITICAL: LangBot webhook has 15 second timeout. We must return skip_pipeline=True immediately
+    # to prevent LangBot's own pipeline from processing the message, then process asynchronously.
     try:
         # Get Temporal client
         client = await get_temporal_client()
 
-        # Start workflow execution
+        # Start workflow execution (asynchronously via start_workflow, not execute_workflow)
         # Workflow ID includes user_id, group_id, and timestamp for uniqueness
         # Use timestamp to ensure unique ID even for rapid consecutive messages
         timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
         group_id_part = request.group_id if request.group_id else "private"
         workflow_id = f"process_message_{request.user_id}_{group_id_part}_{timestamp_ms}"
 
-        # Execute workflow
-        # Note: execute_workflow requires args as a list/sequence, not individual positional arguments
-        # Set timeouts: execution_timeout (total), run_timeout (single run), task_timeout (single task)
+        # Start workflow asynchronously (don't wait for completion)
+        # This allows webhook to return immediately and avoid timeout
         logger.info(
-            "workflow_starting",
+            "workflow_starting_async",
             workflow_id=workflow_id,
             user_id=request.user_id[:8] + "...",
             message_type="private" if not request.group_id else "group",
         )
         
-        try:
-            result = await client.execute_workflow(
-                ProcessMessageWorkflow.run,
-                args=[
-                    request.user_id,
-                    request.group_id,
-                    request.message,
-                    request.images,
-                ],
-                id=workflow_id,
-                task_queue="mika-bot-task-queue",
-                execution_timeout=timedelta(minutes=2),  # Total timeout: 2 minutes
-                run_timeout=timedelta(minutes=1),  # Single run timeout: 1 minute
-                task_timeout=timedelta(seconds=30),  # Single task timeout: 30 seconds
-            )
-            logger.info(
-                "workflow_completed",
+        # Start workflow handle (non-blocking)
+        workflow_handle = await client.start_workflow(
+            ProcessMessageWorkflow.run,
+            args=[
+                request.user_id,
+                request.group_id,
+                request.message,
+                request.images,
+            ],
+            id=workflow_id,
+            task_queue="mika-bot-task-queue",
+            execution_timeout=timedelta(minutes=2),  # Total timeout: 2 minutes
+            run_timeout=timedelta(minutes=1),  # Single run timeout: 1 minute
+            task_timeout=timedelta(seconds=30),  # Single task timeout: 30 seconds
+        )
+        
+        # IMPORTANT: Return immediately with skip_pipeline=True to prevent LangBot from processing
+        # The workflow will process asynchronously and send message via LangBot API when ready
+        # Per user feedback: LangBot's own pipeline is also processing messages, causing duplicates
+        # Solution: Return skip_pipeline=True immediately, then process asynchronously
+        
+        # Start async task to wait for workflow result and send message
+        # Use asyncio.create_task to run in background (non-blocking)
+        import asyncio
+        asyncio.create_task(
+            _handle_workflow_result_async(
+                workflow_handle=workflow_handle,
                 workflow_id=workflow_id,
-                success=result.get("success", False),
-                response_length=len(result.get("response", "")),
+                event=event,
+                request=request,
+                parsed_input=parsed_input,
             )
-        except TemporalTimeoutError as timeout_error:
-            # Workflow timed out - likely because Worker is not running
-            logger.error(
-                "workflow_timeout",
-                workflow_id=workflow_id,
-                error=str(timeout_error),
-                hint="Worker may not be running. Start with: poetry run python -m src.workers.temporal_worker",
+        )
+        
+        # Return immediately with skip_pipeline=True to prevent LangBot pipeline processing
+        # The actual response will be sent via LangBot API when workflow completes
+        logger.info(
+            "webhook_returning_immediately",
+            workflow_id=workflow_id,
+            skip_pipeline=True,
+            message="Returning immediately to avoid webhook timeout, processing asynchronously",
+        )
+        
+        return LangBotWebhookResponse(
+            status="ok",
+            skip_pipeline=True,  # CRITICAL: Skip LangBot's pipeline to prevent duplicate responses
+            message=None,  # Don't return message here, will send via API when ready
+            response="",
+            success=True,
+        )
+    except Exception as start_workflow_error:
+        # If starting workflow fails, return immediately with skip_pipeline=True
+        # to prevent LangBot from processing, then try to send fallback message
+        logger.error(
+            "workflow_start_failed",
+            error=str(start_workflow_error),
+            error_type=type(start_workflow_error).__name__,
+            message="Failed to start workflow, returning immediately to prevent LangBot timeout",
+        )
+        
+        # Try to send fallback message asynchronously if event is available
+        if event and settings.langbot_api_key:
+            import asyncio
+            asyncio.create_task(
+                _send_fallback_message_async(
+                    event=event,
+                    request=request,
+                    message="Don! Mika暂时无法回应，但我会尽快回来的！🥁",
+                )
             )
-            # Return fallback response instead of raising
-            fallback_text = "Don! Mika暂时无法回应，工作流执行超时。请检查 Worker 是否在运行。🥁"
-            return LangBotWebhookResponse(
-                status="ok",
-                skip_pipeline=True,
-                message=[{"type": "Plain", "text": fallback_text}],
-                response=fallback_text,
-                success=False,
-            )
-        except WorkflowFailureError as workflow_failure:
-            # Workflow failed during execution
-            logger.error(
-                "workflow_failure",
-                workflow_id=workflow_id,
-                error=str(workflow_failure),
-                error_type=type(workflow_failure).__name__,
-            )
-            # Return fallback response
-            fallback_text = "Don! Mika处理消息时出错了，但我会尽快恢复的！🥁"
-            return LangBotWebhookResponse(
-                status="ok",
-                skip_pipeline=True,
-                message=[{"type": "Plain", "text": fallback_text}],
-                response=fallback_text,
-                success=False,
-            )
-        except Exception as workflow_error:
-            logger.error(
-                "workflow_execution_error",
-                workflow_id=workflow_id,
-                error=str(workflow_error),
-                error_type=type(workflow_error).__name__,
-            )
-            # Return fallback response for other errors
-            fallback_text = "Don! Mika遇到了意外错误，但我会尽快回来的！🥁"
-            return LangBotWebhookResponse(
-                status="ok",
-                skip_pipeline=True,
-                message=[{"type": "Plain", "text": fallback_text}],
-                response=fallback_text,
-                success=False,
-            )
+        
+        # Return immediately with skip_pipeline=True to prevent LangBot processing
+        return LangBotWebhookResponse(
+            status="ok",
+            skip_pipeline=True,  # CRITICAL: Skip LangBot's pipeline
+            message=None,
+            response="",
+            success=False,
+        )
 
+
+
+async def _send_fallback_message_async(
+    event: LangBotEventRequest,
+    request: LangBotWebhookRequest,
+    message: str,
+) -> None:
+    """
+    Send fallback message asynchronously via LangBot API.
+    
+    This is a helper function to send fallback messages in the background
+    when workflow fails to start or other errors occur.
+    
+    Args:
+        event: LangBot event request (for bot_uuid and event_type).
+        request: Parsed webhook request.
+        message: Fallback message text.
+    """
+    try:
+        await _send_langbot_message(
+            bot_uuid=event.data.get("bot_uuid"),
+            event_type=event.event_type,
+            target_id=request.user_id if not request.group_id else request.group_id,
+            message=message,
+        )
+        logger.info(
+            "fallback_message_sent_async",
+            message_length=len(message),
+        )
+    except Exception as send_error:
+        logger.error(
+            "fallback_message_send_failed_async",
+            error=str(send_error),
+            error_type=type(send_error).__name__,
+        )
+
+
+async def _handle_workflow_result_async(
+    workflow_handle,
+    workflow_id: str,
+    event: Optional[LangBotEventRequest],
+    request: LangBotWebhookRequest,
+    parsed_input,
+) -> None:
+    """
+    Handle workflow result asynchronously after webhook has returned.
+    
+    This function waits for the workflow to complete, then sends the response
+    via LangBot API. This allows the webhook to return immediately with
+    skip_pipeline=True to prevent LangBot's own pipeline from processing.
+    
+    Args:
+        workflow_handle: Temporal workflow handle.
+        workflow_id: Workflow ID for logging.
+        event: LangBot event request (for bot_uuid and event_type).
+        request: Parsed webhook request.
+        parsed_input: Parsed input from step1.
+    """
+    try:
+        # Wait for workflow to complete (this is async and non-blocking for webhook)
+        result = await workflow_handle.result()
+        
         # Extract response from workflow result
         response = result.get("response", "")
         success = result.get("success", False)
@@ -645,40 +716,25 @@ async def _process_webhook_request(
         # Log workflow completion
         if success:
             logger.info(
-                "workflow_completed",
+                "workflow_completed_async",
                 workflow_id=workflow_id,
-                hashed_user_id=parsed_input.hashed_user_id[:8] + "...",
+                hashed_user_id=parsed_input.hashed_user_id[:8] + "..." if parsed_input else "unknown",
                 has_song_info=bool(result.get("song_info")),
+                response_length=len(response),
             )
         else:
             logger.info(
-                "workflow_filtered",
+                "workflow_filtered_async",
                 workflow_id=workflow_id,
                 reason="message_filtered_in_workflow",
             )
-
-        # Format response for LangBot
-        # LangBot expects message in format: [{"type": "Plain", "text": "..."}]
-        message_array = None
-        if response:
-            message_array = [{"type": "Plain", "text": response}]
-
-        # Log the response we're sending to LangBot
-        logger.info(
-            "langbot_response_prepared",
-            skip_pipeline=True,
-            has_message=bool(message_array),
-            message_length=len(response) if response else 0,
-            message_preview=response[:50] if response else None,
-            has_event=bool(event),
-            has_api_key=bool(settings.langbot_api_key),
-        )
 
         # Send message via LangBot API if API key is configured and event is available
         if response and success:
             if not event:
                 logger.warning(
-                    "langbot_api_send_skipped",
+                    "langbot_api_send_skipped_async",
+                    workflow_id=workflow_id,
                     reason="event_not_available",
                     hint="Webhook request may be in simplified format, not event format",
                     has_response=bool(response),
@@ -686,7 +742,8 @@ async def _process_webhook_request(
                 )
             elif not settings.langbot_api_key:
                 logger.warning(
-                    "langbot_api_send_skipped",
+                    "langbot_api_send_skipped_async",
+                    workflow_id=workflow_id,
                     reason="api_key_not_configured",
                     hint="Set LANGBOT_API_KEY in .env file",
                     has_event=bool(event),
@@ -695,10 +752,12 @@ async def _process_webhook_request(
             else:
                 # All conditions met - send message
                 logger.info(
-                    "langbot_api_send_attempting",
+                    "langbot_api_send_attempting_async",
+                    workflow_id=workflow_id,
                     bot_uuid=event.data.get("bot_uuid", "unknown")[:8] + "..." if event.data.get("bot_uuid") else "unknown",
                     event_type=event.event_type,
                     target_id=request.user_id[:8] + "..." if not request.group_id else request.group_id[:8] + "...",
+                    message_length=len(response),
                 )
                 try:
                     await _send_langbot_message(
@@ -707,47 +766,40 @@ async def _process_webhook_request(
                         target_id=request.user_id if not request.group_id else request.group_id,
                         message=response,
                     )
+                    logger.info(
+                        "langbot_api_send_success_async",
+                        workflow_id=workflow_id,
+                        message_length=len(response),
+                    )
                 except Exception as send_error:
-                    # Log error but don't fail the webhook response
+                    # Log error but don't fail (webhook already returned)
                     logger.error(
-                        "langbot_api_send_failed",
+                        "langbot_api_send_failed_async",
+                        workflow_id=workflow_id,
                         error=str(send_error),
                         error_type=type(send_error).__name__,
                         bot_uuid=event.data.get("bot_uuid", "unknown")[:8] + "..." if event.data.get("bot_uuid") else "unknown",
                     )
         else:
             logger.debug(
-                "langbot_api_send_skipped",
+                "langbot_api_send_skipped_async",
+                workflow_id=workflow_id,
                 reason="no_response_or_not_success",
                 has_response=bool(response),
                 success=success,
             )
-
-        return LangBotWebhookResponse(
-            status="ok",
-            skip_pipeline=True,  # Skip LangBot's pipeline to use our response
-            message=message_array,
-            response=response,  # Keep for compatibility
-            success=success,
-        )
-
-    except Exception as e:
-        import traceback
-        error_traceback = traceback.format_exc()
+    except TemporalTimeoutError as timeout_error:
+        # Workflow timed out
         logger.error(
-            "workflow_execution_failed",
-            error=str(e),
-            error_type=type(e).__name__,
-            hashed_user_id=parsed_input.hashed_user_id[:8] + "...",
-            traceback=error_traceback,
+            "workflow_timeout_async",
+            workflow_id=workflow_id,
+            error=str(timeout_error),
+            hint="Workflow execution timed out",
         )
-        # Per FR-009: Graceful degradation
-        # Return fallback response if workflow fails
-        fallback_text = "Don! Mika暂时无法回应，但我会尽快回来的！🥁"
-        
-        # Try to send fallback message via LangBot API
+        # Try to send fallback message if event is available
         if event and settings.langbot_api_key:
             try:
+                fallback_text = "Don! Mika暂时无法回应，处理超时了。🥁"
                 await _send_langbot_message(
                     bot_uuid=event.data.get("bot_uuid"),
                     event_type=event.event_type,
@@ -756,17 +808,41 @@ async def _process_webhook_request(
                 )
             except Exception as send_error:
                 logger.error(
-                    "langbot_api_send_fallback_failed",
+                    "langbot_api_send_fallback_failed_async",
+                    workflow_id=workflow_id,
                     error=str(send_error),
-                    error_type=type(send_error).__name__,
                 )
-        
-        return LangBotWebhookResponse(
-            status="ok",
-            skip_pipeline=True,
-            message=[{"type": "Plain", "text": fallback_text}],
-            response=fallback_text,
-            success=False,
+    except WorkflowFailureError as workflow_failure:
+        # Workflow failed
+        logger.error(
+            "workflow_failure_async",
+            workflow_id=workflow_id,
+            error=str(workflow_failure),
+            error_type=type(workflow_failure).__name__,
+        )
+        # Try to send fallback message if event is available
+        if event and settings.langbot_api_key:
+            try:
+                fallback_text = "Don! Mika处理消息时出错了，但我会尽快恢复的！🥁"
+                await _send_langbot_message(
+                    bot_uuid=event.data.get("bot_uuid"),
+                    event_type=event.event_type,
+                    target_id=request.user_id if not request.group_id else request.group_id,
+                    message=fallback_text,
+                )
+            except Exception as send_error:
+                logger.error(
+                    "langbot_api_send_fallback_failed_async",
+                    workflow_id=workflow_id,
+                    error=str(send_error),
+                )
+    except Exception as workflow_error:
+        # Other errors
+        logger.error(
+            "workflow_error_async",
+            workflow_id=workflow_id,
+            error=str(workflow_error),
+            error_type=type(workflow_error).__name__,
         )
 
 

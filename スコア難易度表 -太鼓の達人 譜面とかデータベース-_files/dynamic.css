@@ -1,0 +1,165 @@
+/*JSで動的に入れるCSS専用*/
+
+/*段位欄の背景色*/
+.dan_i-color_wood {
+	background-image: url("/image/title_background/title_background_wood.png");
+}
+
+.dan_i-color_blue {
+	background-image: url("/image/title_background/title_background_blue.png");
+}
+
+.dan_i-color_red {
+	background-image: url("/image/title_background/title_background_red.png");
+}
+
+.dan_i-color_silver {
+	background-image: url("/image/title_background/title_background_silver.png");
+}
+
+.dan_i-color_gold {
+background-image: url("/image/title_background/title_background_gold.png");
+}
+
+/*ジャンル色*/
+.genre_pops_color {
+	background-color: #49d5eb;
+}
+
+.genre_anime_color {
+	background-color: #fe90d2;
+}
+
+.genre_kids_color {
+	background-color: #fdc000;
+}
+
+.genre_vocaloid_color {
+	background-color: #cbcfde;
+}
+
+.genre_game_color {
+	background-color: #cc8aeb;
+}
+
+.genre_variety_color {
+	background-color: #0acc2a;
+}
+
+.genre_classic_color {
+	background-color: #ded523;
+}
+
+.genre_namco_color {
+	background-color: #ff7028;
+}
+
+/*BPM色分け*/
+.bpm_maxhigh_color {
+	background-color: #ffd5d5;
+}
+
+.bpm_high_color {
+	background-color: #ffe9d4;
+}
+
+.bpm_medium_color {
+	background-color: #fff9c6;
+}
+
+.bpm_slow_color {
+	background-color: #cff1dc;
+}
+
+.bpm_veryslow_color {
+	background-color: #dde6fa;
+}
+
+/*難易度表ページのレーティングの色分け*/
+.rating_mark_silver {
+	background-color: rgb(227, 232, 234);
+	background-size: 101% 101%;
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+.rating_mark_gold {
+	background-color: rgb(212, 202, 140);
+	background-size: 101% 101%;
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+.rating_mark_purple {
+	background-color: rgb(178, 69, 251);
+	background-size: 103% 103%;
+	background-repeat: no-repeat;
+	background-position: center;
+	color: rgba(255, 255, 255, 0.926);
+}
+
+/*フィルター非表示用クラス*/
+.hide_filter_genre,
+.hide_filter_star,
+.hide_filter_difficulty,
+.hide_filter_crown,
+.hide_filter_const {
+	display: none;
+}
+
+
+/*ボタン関連*/
+
+/*公開設定用ボタン*/
+.button_publishing_pushed {
+	top: 1.8px;
+	box-shadow: 0 0 1px 0 #1e3a3f;
+	transition: 0.2s;
+	opacity: 0.75;
+}
+
+.button_publishing_pushed.button_publishing_on {
+	background-color: #fb7311FF;
+}
+.button_publishing_pushed.button_publishing_off {
+	background-color: #4b7bffFF;
+}
+
+/*トップページ＆お知らせのページ送り用ボタン*/
+.pagination-button {
+	display: inline-block;
+	padding: 5px 12px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	background-color: #f9f9f9;
+	color: #333;
+	cursor: pointer;
+	transition: background-color 0.2s, color 0.2s;
+	font-size: 18px;
+	font-family: "DotGothic16", sans-serif;
+	user-select:none;
+	-webkit-user-select:none;
+	-ms-user-select: none;
+	-moz-user-select:none;
+	-khtml-user-select:none;
+	-webkit-user-drag:none;
+	-khtml-user-drag:none;
+}
+
+.pagination-button.active {
+	background-color: #007bff;
+	color: #fff;
+	font-weight: bold;
+}
+
+.pagination-button:hover {
+	background-color: #0056b3;
+	color: white;
+}
+
+@media (max-width: 768px) {
+	.pagination-button {
+		padding: 3px 7px;
+		font-size: 0.9em;
+	}
+}

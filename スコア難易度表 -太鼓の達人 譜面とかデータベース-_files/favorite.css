@@ -1,0 +1,83 @@
+.favorite_song-column {
+  margin-top: 5px;
+  width: 100%;
+}
+
+.favorite_song {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  margin-top: 5px;
+}
+
+.favorite_song-title {
+  width: 200px;
+  text-align: center;
+  padding: 2px;
+  margin: 0 auto;
+  justify-content: center;
+  border-top: 2px solid rgba(46, 195, 180, 0.801);
+  border-left: 2px solid rgba(46, 195, 180, 0.801);
+  border-right: 2px solid rgba(46, 195, 180, 0.801);
+  border-radius: 7.8px 7.8px 0 0;
+  font-size: 18px;
+  font-family: "DotGothic16", sans-serif;
+  font-style: normal;
+  font-weight: bold;
+}
+
+.favorite_song_content {
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+}
+
+.favorite_song_name {
+  display: inline-block;
+  font-size: 19px;
+  width: 80%;
+  margin: 0 auto;
+  justify-content: center;
+  border: 1px solid rgba(46, 195, 180, 0.801);
+  border-bottom: 1px dotted rgba(46, 195, 180, 0.578);
+  border-radius: 10px 10px 0 0;
+}
+
+.favorite_song_name a {
+  font-family: "DotGothic16", sans-serif;
+  font-style: normal;
+}
+
+.favorite_song_text {
+  display: inline-block;
+  min-height: 8px;
+  bottom: 4px;
+  font-size: 12px;
+  padding-top: 8px;
+  width: 80%;
+  margin: 0 auto;
+  border: 1px solid rgba(46, 195, 180, 0.801);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+}
+
+@media (max-width: 640px) {
+  .favorite_song-column, .favorite_song_name, .favorite_song_text {
+    width: 100%;
+  }
+
+  .favorite_song_name {
+	font-size: 14px;
+	padding: 5px 12px;
+  }
+
+  .favorite_song_text {
+	font-size: 10px;
+	padding: 5px 12px;
+  }
+}
+
+.favorite_song_name a {
+  color: rgb(101, 178, 255);
+  text-decoration: none;
+}

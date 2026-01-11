@@ -1,0 +1,6 @@
+window.addEventListener("load", function() {
+	loading_screen.style.opacity = 0;
+	setTimeout(function() {
+		loading_screen.style.display = "none";
+	}, 1000)
+})

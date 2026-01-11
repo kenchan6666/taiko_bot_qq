@@ -1,0 +1,82 @@
+// ハンバーガーメニューの表示/非表示制御
+const apper = document.querySelector("#hamburger_apper")
+const hide = document.querySelector("#hamburger_hide")
+const menu = document.querySelector("#hamburger_menu")
+const header_menu_outside = document.querySelector("#header_menu_outside")
+const logout_menu = document.querySelector("#logout")
+
+// ハンバーガーメニューを表示
+apper.addEventListener('click', function () {
+	apper.classList.add('hide');
+	hide.classList.remove('hide');
+	menu.classList.remove('hide');
+	menu.style.display = "flex"
+	header_menu_outside.classList.remove('hide');
+});
+
+// ハンバーガーメニューを非表示
+hide.addEventListener('click', function () {
+	apper.classList.remove('hide');
+	hide.classList.add('hide');
+	menu.classList.add('hide');
+	menu.style.display = "none"
+	header_menu_outside.classList.add('hide');
+});
+
+// メニュー外のクリックでメニューを閉じる
+header_menu_outside.addEventListener('click', function () {
+	apper.classList.remove('hide');
+	hide.classList.add('hide');
+	menu.classList.add('hide');
+	menu.style.display = "none"
+	header_menu_outside.classList.add('hide');
+});
+
+// ページロード時にトップへスクロールボタンを設定
+window.onload = function () {
+	const btn = document.getElementById('scroll_button');
+	btn.addEventListener('click', function () {
+		window.scrollTo({
+			top: 0,
+			behavior: 'smooth'
+		});
+	});
+};
+
+// スクロール位置に基づいてスクロールボタンを制御
+document.addEventListener('DOMContentLoaded', function () {
+	window.addEventListener('resize', function () { });
+
+	setTimeout(function() {
+		window.addEventListener('scroll', function () {
+			const scroll_position = window.scrollY;
+			let scroll_button_position = window.scrollY + (window.innerHeight * 4 / 5)
+
+			if (scroll_position > 1200 && document.body.scrollHeight - scroll_button_position > 250) {
+				scroll_button.classList.remove('displayed_fadeout');
+				scroll_button.classList.add('displayed_fadeup');
+				scroll_button.style.position = 'fixed';
+				scroll_button.style.top = '85%';
+				setTimeout(function() {
+					scroll_button.style.display = 'block';
+				}, 500);
+			} else {
+				scroll_button.classList.remove('displayed_fadeup');
+				scroll_button.classList.add('displayed_fadeout');
+				setTimeout(function() {
+					scroll_button.style.display = 'none';
+				}, 500);
+			}
+		}, 1000);
+	});
+});
+
+//ログアウト時のアラート
+if (logout_menu) {
+	logout_menu.addEventListener("click", (event) => {
+		const confirm_logout = confirm("ログアウトしますか？");
+		if (!confirm_logout) {
+			event.preventDefault(); // ログアウトをキャンセル
+		}
+	})
+}

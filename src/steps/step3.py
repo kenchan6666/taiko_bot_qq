@@ -143,10 +143,19 @@ async def query_song(message: str) -> Optional[dict]:
         return None
 
     # Return song information with fallback indicator
-    return {
+    # Per user requirement: Include real difficulty info for AI impression
+    result = {
         "song_name": song["name"],
         "difficulty_stars": song["difficulty_stars"],
         "bpm": song["bpm"],
         "metadata": song.get("metadata", {}),
         "used_fallback": used_fallback,  # Indicate if fallback was used
     }
+    
+    # Add real difficulty info if available (from difficulty database)
+    if "real_difficulty" in song:
+        result["real_difficulty"] = song["real_difficulty"]
+    if "difficulty_category" in song:
+        result["difficulty_category"] = song["difficulty_category"]
+    
+    return result

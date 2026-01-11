@@ -1,0 +1,266 @@
+/*背景色の色分け系（動的css以外）*/
+
+.category_signup{
+	background-color: rgb(255, 209, 71);
+	color: rgb(0, 0, 0);
+}
+
+.category_mypage{
+	background-color: rgb(255, 95, 20);
+	color: rgb(0, 0, 0);
+}
+
+.category_rating{
+	background-color: rgb(167, 223, 116);
+	color: rgb(0, 0, 0);
+}
+
+.category_difficulty{
+	background-color: rgb(139, 226, 251);
+	color: rgb(0, 0, 0);
+}
+
+.category_account{
+	background-color: rgb(199, 157, 222);
+	color: rgb(0, 0, 0);
+}
+
+.table_cas_silver,
+.scorelist_crown_silver,
+.scorelist_scorerank_silver {
+  background: linear-gradient(
+    45deg,
+    #7c7d81 0%,
+    #9a9ba0 45%,
+    #c7cfd3 70%,
+    #a8a9b1 85%,
+    #97999f 90% 100%
+  );
+}
+
+.table_cas_gold,
+.scorelist_crown_gold,
+.scorelist_scorerank_gold{
+  background: linear-gradient(
+    45deg,
+    #c48914 0%,
+    #daaf08 45%,
+    #f3df95 70%,
+    #d4ad11 85%,
+    #d3900b 90% 100%
+  );
+}
+
+.table_cas_rainbow,
+.scorelist_crown_rainbow,
+.scorelist_scorerank_rainbow {
+  background: linear-gradient(
+    to right,
+    #f59090,
+    #fcd7a1,
+    #fff9b1,
+    #a5d4ad,
+    #a3bce2,
+    #a59aca,
+    #cfa7cd
+  );
+}
+
+.table_crown_lightgold {
+  background-color: #e3d24c3c;
+}
+
+.table_crown_rainbow {
+  background: linear-gradient(
+    to right,
+    #f5909085,
+    #fcd8a185,
+    #fff9b191,
+    #a5d4ad70,
+    #a3bce270,
+    #a59aca65,
+    #cfa7cd70
+  );
+}
+
+.table_cas_white,
+.scorelist_scorerank_white {
+  background: linear-gradient(
+    45deg,
+    #f4f4f4 0%,
+    #ececec 45%,
+    #f7f5f5 70%,
+    #ececec 85%,
+    #dedede 90% 100%
+  );
+}
+
+.table_cas_bronze,
+.scorelist_scorerank_bronze {
+  background: linear-gradient(
+    45deg,
+    #a57e65 0%,
+    #a57e65 45%,
+    #deb8a1 70%,
+    #a57e65 85%,
+    #9a6f55 90% 100%
+  );
+}
+
+.table_cas_pink,
+.scorelist_scorerank_pink {
+  background: linear-gradient(
+    45deg,
+    #ff6fff 0%,
+    #ff00ff 45%,
+    #f190f1 70%,
+    #ff00ff 85%,
+    #eb1feb 90% 100%
+  );
+}
+
+.table_cas_purple,
+.scorelist_scorerank_purple {
+  background: linear-gradient(
+    45deg,
+    #d16fff 0%,
+    #bb00ff 45%,
+    #cc88eb 70%,
+    #bb00ff 85%,
+    #a71feb 90% 100%
+  );
+}
+
+.table_cas_blue {
+  color: white;
+  background: linear-gradient(
+    45deg,
+    #afb1cc 0%,
+    #9ba2de 20%,
+    #7c86df 60%,
+    #5f68b8 80% 100%
+  );
+}
+
+.table_cas_red {
+  background: linear-gradient(
+    225deg,
+    #ff0000 0%,
+    #ef7575 20%,
+    #f69898 40%,
+    #ff1b1b 80% 100%
+  );
+}
+
+.table_rating_rank_gold {
+	background: linear-gradient(
+		45deg,
+		#f2e1a6 0%,
+		#f7e9b9 45%,
+		#fcf6dd 70%,
+		#f7e9b9 85%,
+		#f2e1a6 90% 100%
+	);
+}
+
+.table_rating_rank_red {
+	background: linear-gradient(
+		225deg,
+		#f87d7d 0%,
+		#ef9898 20%,
+		#f3b9b9 40%,
+		#ef9898 80% 100%
+	 );
+}
+
+.table_rating_rank_blue {
+	background: linear-gradient(
+		45deg,
+		#5897e0 0%,
+		#87b3e6 20%,
+		#92b4dc 60%,
+		#87b3e6 80% 100%
+	);
+}
+
+.table_rating_rank_white {
+	background-color: #edededb7;
+}
+
+.difficulty_extreme_color {
+  background-color: #d83fa5;
+  color: white;
+  font-weight: bold;
+}
+
+.difficulty_hidden_color {
+  background-color: #6e4bf9;
+  color: white;
+  font-weight: bold;
+}
+
+.difficulty_ex_hid_color {
+  background: linear-gradient(135deg, #d83fa5 0%, #6e4bf9 100%);
+  color: white;
+  font-weight: bold;
+}
+
+.difficulty_hard_color {
+  background-color: #3a80a3;
+  color: white;
+  font-weight: bold;
+}
+
+.difficulty_normal_color {
+  background-color: #87b416;
+  color: white;
+  font-weight: bold;
+}
+
+.difficulty_easy_color {
+  background-color: #e84a27;
+  color: white;
+  font-weight: bold;
+}
+
+.difficulty_other_color {
+  background-color: #27248d;
+  color: white;
+  font-weight: bold;
+}
+
+.table_const_purple {
+	background-color: #d689fadd;
+ }
+ 
+ .table_const_gold {
+	background-color: #cfad33b1;
+ }
+ 
+ .table_const_silver {
+	background-color: #e1e1e4ca;
+ }
+ 
+ .table_const_red {
+	background-color: #ef7346a9;
+ }
+ 
+ .table_const_cyan {
+	background-color: #84d0d7cf;
+ }
+ 
+ .table_const_pink {
+	background-color: #ffc0faba;
+ }
+ 
+ .table_const_orange {
+	background-color: #ffa25684;
+ }
+ 
+ .table_const_yellow {
+	background-color: #ffffc1b1;
+ }
+ 
+ .table_const_white {
+	background-color: #ffffff;
+ }
