@@ -16,6 +16,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from src.config import settings
 from src.models.conversation import Conversation
 from src.models.impression import Impression
+from src.models.meme_knowledge import MemeKnowledge
 from src.models.user import User
 
 
@@ -65,6 +66,7 @@ async def init_database() -> None:
             User,
             Conversation,
             Impression,
+            MemeKnowledge,
         ],
     )
 
