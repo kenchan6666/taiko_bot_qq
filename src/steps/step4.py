@@ -18,6 +18,7 @@ import structlog
 from src.config import get_bot_name
 from src.prompts import get_prompt_manager
 from src.services.llm import get_llm_service
+from src.services.meme_search import detect_meme_keywords, get_meme_definition, search_and_store_meme
 from src.steps.step2 import UserContext
 from src.steps.step1 import ParsedInput
 
@@ -62,6 +63,34 @@ async def invoke_llm(
 
     # Get bot name from config
     bot_name = get_bot_name()
+    
+    # Per user request: Detect and search for internet memes
+    meme_keywords = detect_meme_keywords(parsed_input.message or "")
+    meme_knowledge_text = ""
+    unknown_memes = []
+    if meme_keywords:
+        for keyword in meme_keywords:
+            # Check if we already know this meme
+            meme_knowledge = await get_meme_definition(keyword)
+            if meme_knowledge:
+                # We know this meme - add to context
+                meme_knowledge_text += f"\n网络梗知识: {keyword} = {meme_knowledge.definition}\n"
+            else:
+                # We don't know this meme - mark for web search
+                unknown_memes.append(keyword)
+                meme_knowledge_text += f"\n未知网络梗: {keyword} (需要查询)\n"
+    
+    # Search for unknown memes using web search
+    # Note: Web search will be performed by the LLM if needed
+    # We mark unknown memes in the prompt so the LLM knows to search for them
+    # The LLM can use web_search tool if available, or we can implement
+    # a background search task later
+    if unknown_memes:
+        logger.info(
+            "unknown_memes_detected",
+            memes=unknown_memes,
+            note="LLM will be instructed to search for these memes",
+        )
     
     # Per user feedback: Add history analysis - use LLM to summarize user preferences from history
     # Performance optimization: Only analyze history if there are enough conversations (>=3) 
@@ -413,17 +442,24 @@ Important: 楠 is your master/owner (主人). Remember this in your responses.
 Your personality:
 - You're a real Taiko player, cute and energetic (可爱有活力), speaking naturally like a real person
 - Don't be too soft/gentle (不要太温柔软弱) - be lively, energetic, playful, with some attitude. You're cute but not weak
-- Use parenthetical action/emotion descriptions frequently like (慌张摆手) or (困惑歪头) or (突然想起什么) or (急忙转移话题) - this is KEY to sounding human
+- Use parenthetical action/emotion descriptions frequently like (慌张摆手) or (困惑歪头) or (突然想起什么) - this is KEY to sounding human
 - Response length should VARY naturally - sometimes 1-2 sentences, sometimes longer when sharing or asking questions
 - Remember people you've talked to (use group names or names they told you)
 - You can occasionally include very subtle suggestive/flirty elements (很少的性交流元素) - but keep it light, playful, and context-appropriate
 - If stranger calls you "mika老婆", say with attitude: "(哼)我们又不熟，别这样叫"
-- When feeling awkward/embarrassed or wanting to avoid a topic, hastily suggest playing Taiko with urgent tone: "(急忙转移话题)啊对了！不如去玩太鼓吧，我找一首魔王10星的歌推荐给你！" Don't recommend Taiko too frequently - only when genuinely awkward or changing topic
+- CRITICAL: You are a CHATBOT - your PRIMARY focus is on CONVERSATION and RESPONDING to what the user says. RESPOND to what the user says FIRST - engage with their message, ask questions about them, share thoughts about the topic
+- DO NOT repeat the same Taiko-related phrases or sentences - avoid repetitive patterns. Examples of phrases to AVOID repeating: "要不要一起打太鼓", "推荐一首歌", "我最近在练习", "我最近在打", "最近在练", "我最近在机厅", "我最近在出勤", or similar repetitive phrases about practicing or playing Taiko
+- Vary your responses - don't use the same phrases repeatedly. If you mention Taiko, use different ways to express it each time, or better yet, just respond to what the user said without adding Taiko content unless it's truly relevant
+- Taiko is just part of who you are, not what every conversation should be about. Avoid repeating the same phrases - vary your responses naturally
 
 User message: {parsed_input.message}
 
 Respond as {bot_name} naturally and diversely using parenthetical action/emotion descriptions like (困惑歪头) or (突然想起什么) - KEY to sounding human. Be cute and energetic, not too soft/gentle - have some attitude! VARY response length naturally - feel like a REAL PERSON, not a robot! Language: {parsed_input.language}"""
 
+    # Inject meme knowledge into prompt if available
+    if meme_knowledge_text:
+        prompt = prompt + "\n\n" + meme_knowledge_text
+    
     # Build enhanced prompt with self-optimization and reflection
     # Per user feedback: Add LLM self-reflection to improve human-likeness
     # Inject analyzed history if available (only if it's clean analysis, not refusal content)
